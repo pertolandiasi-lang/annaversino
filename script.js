@@ -185,3 +185,4 @@ window.addEventListener("scroll", updateUniverseBackground, { passive: true });
 window.addEventListener("scroll", updateMobileHeaderState, { passive: true });
 window.addEventListener("resize", updateUniverseBackground);
 window.addEventListener("resize", updateMobileHeaderState);
+ 
