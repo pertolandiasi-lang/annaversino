@@ -132,6 +132,11 @@ a {
   opacity: 1;
 }
 
+.mobile-nav-preview,
+.header-actions {
+  display: none;
+}
+
 .section,
 .hero {
   position: relative;
@@ -866,8 +871,9 @@ h3 {
     padding: 14px 16px;
     border-radius: 28px;
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr;
     align-items: center;
+    justify-items: center;
   }
 
   .brand img {
@@ -881,11 +887,41 @@ h3 {
 
   .brand {
     grid-column: 1 / -1;
-    justify-self: start;
+    justify-self: center;
   }
 
-  .site-header > .site-header-bar > .button {
-    justify-self: start;
+  .mobile-nav-preview {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    gap: 18px;
+    padding: 10px 14px 2px;
+    color: var(--white);
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .mobile-nav-preview::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-nav-preview a {
+    opacity: 0.92;
+  }
+
+  .header-actions {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    gap: 14px;
+  }
+
+  .header-actions .button,
+  .header-actions .menu-toggle {
+    min-width: 156px;
+    justify-content: center;
   }
 
   .site-nav {
@@ -893,6 +929,37 @@ h3 {
     align-items: flex-start;
     gap: 12px;
     font-size: 1rem;
+  }
+
+  .site-header.mobile-scrolled .site-header-bar {
+    gap: 10px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .site-header.mobile-scrolled .brand img {
+    width: min(146px, 42vw);
+  }
+
+  .site-header.mobile-scrolled .mobile-nav-preview {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .site-header.mobile-scrolled .header-actions {
+    gap: 10px;
+  }
+
+  .site-header.mobile-scrolled .header-actions .button,
+  .site-header.mobile-scrolled .header-actions .menu-toggle {
+    min-width: 132px;
+    min-height: 46px;
+    padding: 0 18px;
+    font-size: 0.96rem;
   }
 
   .glass-group {
@@ -1030,9 +1097,19 @@ h3 {
     width: min(144px, 46vw);
   }
 
-  .menu-toggle,
-  .site-header > .site-header-bar > .button {
-    min-width: 132px;
+  .mobile-nav-preview {
+    gap: 14px;
+    font-size: 0.9rem;
+  }
+
+  .header-actions {
+    gap: 10px;
+  }
+
+  .header-actions .menu-toggle,
+  .header-actions .button {
+    min-width: 0;
+    flex: 1 1 0;
   }
 
   .button,
