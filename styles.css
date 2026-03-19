@@ -695,6 +695,16 @@ h3 {
   margin: 0;
 }
 
+.product-tile,
+.blog-item,
+.feature-card,
+.insight-card,
+.hero-mission,
+.glass-group,
+.site-header-bar {
+  overflow: hidden;
+}
+
 .site-footer {
   padding: 28px 24px;
   background: transparent;
@@ -762,6 +772,7 @@ h3 {
 
   .site-header-bar {
     flex-wrap: wrap;
+    justify-content: space-between;
     padding: 14px 18px;
   }
 
@@ -775,6 +786,7 @@ h3 {
     display: none;
     flex-basis: 100%;
     justify-content: flex-start;
+    gap: 16px;
     padding-top: 10px;
   }
 
@@ -797,16 +809,51 @@ h3 {
   .workshop-grid {
     gap: 24px;
   }
+
+  .split-layout {
+    gap: 34px;
+  }
+
+  .site-background {
+    top: -10vh;
+    bottom: -10vh;
+  }
 }
 
 @media (max-width: 760px) {
   .hero,
   .section {
-    padding: 64px 16px;
+    padding: 58px 16px;
+  }
+
+  .hero {
+    min-height: auto;
+    padding-top: 104px;
   }
 
   .discover-card {
     max-width: calc(100% - 1rem);
+  }
+
+  .discover-mark {
+    width: min(108px, 30vw);
+    margin-bottom: 18px;
+  }
+
+  .discover-card h1 {
+    line-height: 0.9;
+  }
+
+  .button-row {
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hero-discover .button,
+  .hero-discover .button-ghost {
+    width: min(100%, 320px);
   }
 
   .site-header {
@@ -816,10 +863,36 @@ h3 {
   .site-header-bar {
     width: calc(100% - 0.5rem);
     gap: 14px;
+    padding: 14px 16px;
+    border-radius: 28px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
   }
 
   .brand img {
     width: min(160px, 44vw);
+  }
+
+  .menu-toggle {
+    margin-left: 0;
+    padding: 9px 14px;
+  }
+
+  .brand {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .site-header > .site-header-bar > .button {
+    justify-self: start;
+  }
+
+  .site-nav {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 1rem;
   }
 
   .glass-group {
@@ -827,19 +900,185 @@ h3 {
     border-radius: 28px;
   }
 
+  .feature-card,
+  .insight-card {
+    padding: 14px;
+  }
+
+  .card-body {
+    padding: 16px 2px 2px;
+  }
+
+  .insight-card {
+    min-height: 0;
+  }
+
+  .plain-copy p,
+  .card-body p,
+  .faq-answer p,
+  .contact-side p,
+  .form-note,
+  .section-copy {
+    font-size: 0.98rem;
+    line-height: 1.62;
+  }
+
+  .section-heading {
+    margin-bottom: 30px;
+  }
+
+  .section-copy-center {
+    margin-bottom: 24px;
+  }
+
+  .split-layout {
+    gap: 26px;
+  }
+
+  .hero-art-static img {
+    width: min(240px, 72vw);
+  }
+
+  .media-figure img,
+  .portrait-stack img,
+  .workbook-cover img {
+    border-radius: 18px;
+  }
+
+  .workbook-cover,
+  .portrait-stack {
+    gap: 14px;
+  }
+
+  .portrait-name {
+    font-size: 1.7rem;
+  }
+
+  .blog-shell .blog-item {
+    text-align: center;
+  }
+
+  .blog-shell .text-link {
+    margin-top: 14px;
+  }
+
+  .faq-question {
+    padding: 20px 0 12px;
+    font-size: clamp(1.55rem, 7vw, 2.1rem);
+    line-height: 1.05;
+  }
+
+  .contact-grid-plain {
+    gap: 28px;
+  }
+
+  .contact-side {
+    padding-top: 0;
+  }
+
+  .contact-form-plain {
+    margin-top: 18px;
+  }
+
+  .form-grid {
+    gap: 14px;
+  }
+
+  .form-grid input,
+  .form-grid select,
+  .form-grid textarea {
+    padding: 13px 14px;
+  }
+
   .form-grid {
     grid-template-columns: 1fr;
   }
 
   h1 {
-    font-size: clamp(3rem, 15vw, 5.2rem);
+    font-size: clamp(2.9rem, 15vw, 4.6rem);
   }
 
   h2 {
-    font-size: clamp(2.5rem, 12vw, 4rem);
+    font-size: clamp(2.4rem, 12vw, 3.8rem);
   }
 
   h3 {
-    font-size: clamp(1.7rem, 8vw, 2.5rem);
+    font-size: clamp(1.6rem, 8vw, 2.2rem);
+  }
+}
+
+@media (max-width: 520px) {
+  .hero,
+  .section {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .site-header {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .site-header-bar {
+    width: 100%;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 24px;
+  }
+
+  .brand img {
+    width: min(144px, 46vw);
+  }
+
+  .menu-toggle,
+  .site-header > .site-header-bar > .button {
+    min-width: 132px;
+  }
+
+  .button,
+  .button-ghost,
+  .button-outline {
+    min-height: 48px;
+    padding: 0 20px;
+  }
+
+  .hero-discover .button,
+  .hero-discover .button-ghost {
+    width: 100%;
+  }
+
+  .glass-group {
+    padding: 16px 14px;
+    border-radius: 24px;
+  }
+
+  .feature-card,
+  .insight-card {
+    padding: 12px;
+  }
+
+  .product-grid,
+  .blog-grid,
+  .workshop-grid {
+    gap: 20px;
+  }
+
+  .product-tile h3,
+  .blog-item h3 {
+    margin-top: 14px;
+    font-size: 1.6rem;
+  }
+
+  .faq-question::after {
+    font-size: 1.1rem;
+  }
+
+  .modal {
+    padding: 14px;
+  }
+
+  .modal-panel {
+    padding: 22px 18px;
+    border-radius: 22px;
   }
 }
