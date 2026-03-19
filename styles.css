@@ -132,9 +132,14 @@ a {
   opacity: 1;
 }
 
-.mobile-nav-preview,
-.header-actions {
+.mobile-nav-preview {
   display: none;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .section,
