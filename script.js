@@ -11,6 +11,8 @@ const contactForm = document.getElementById("contact-form");
 const formNote = document.getElementById("form-note");
 const siteBackground = document.querySelector(".site-background");
 const siteHeader = document.querySelector(".site-header");
+const navLinks = document.querySelectorAll('a[href^="#"]');
+let mobileMenuScrollAnchor = 0;
 
 const modalContent = {
   mission: {
@@ -19,6 +21,14 @@ const modalContent = {
     body: [
       "Vulvaverse is a space dedicated to breaking down barriers of stigma and taboo. We foster significant body knowledge, ensuring the vulva is recognized for its unique beauty and distinguished from the vagina.",
       "Join us in celebrating a part of ourselves that is rich with stories, shaped by culture, yet entirely our own."
+    ]
+  },
+  join: {
+    kicker: "Join Vulvaverse",
+    title: "Step Into The Space",
+    body: [
+      "Join Vulvaverse through workshops, 1:1 sessions, community conversations, and collaborations centered on body knowledge, celebration, and reclaiming the vulva from shame.",
+      "If you want to connect directly, scroll to the Contact section or reach out via vulvaverse@gmail.com and Instagram @vul_vaverse."
     ]
   },
   talk: {
@@ -86,13 +96,12 @@ function closeModal() {
 menuToggle?.addEventListener("click", () => {
   const isOpen = siteNav.classList.toggle("open");
   menuToggle.setAttribute("aria-expanded", String(isOpen));
-});
+  siteHeader?.classList.toggle("mobile-menu-open", isOpen);
 
-siteNav?.querySelectorAll("a").forEach((link) => {
-  link.addEventListener("click", () => {
-    siteNav.classList.remove("open");
-    menuToggle?.setAttribute("aria-expanded", "false");
-  });
+  if (isOpen && window.innerWidth <= 760) {
+    mobileMenuScrollAnchor = window.scrollY;
+    siteHeader?.style.setProperty("--mobile-menu-progress", "1");
+  }
 });
 
 faqButtons.forEach((button) => {
@@ -174,10 +183,84 @@ function updateMobileHeaderState() {
   }
 
   const isMobile = window.innerWidth <= 760;
-  const isScrolled = window.scrollY > 24;
+  const collapseDistance = 120;
+  const isScrolled = window.scrollY > collapseDistance;
 
   siteHeader.classList.toggle("mobile-scrolled", isMobile && isScrolled);
+
+  if (!isMobile) {
+    siteHeader.classList.remove("mobile-menu-open");
+    siteNav?.classList.remove("open");
+    menuToggle?.setAttribute("aria-expanded", "false");
+    siteHeader.style.setProperty("--mobile-menu-progress", "1");
+    mobileMenuScrollAnchor = 0;
+  }
+
+  if (isMobile && siteNav?.classList.contains("open")) {
+    const menuDelta = Math.max(window.scrollY - mobileMenuScrollAnchor, 0);
+    const menuProgress = Math.max(0, 1 - Math.min(menuDelta / collapseDistance, 1));
+
+    siteHeader.style.setProperty("--mobile-menu-progress", `${menuProgress}`);
+
+    if (menuProgress === 0) {
+      siteNav.classList.remove("open");
+      siteHeader.classList.remove("mobile-menu-open");
+      menuToggle?.setAttribute("aria-expanded", "false");
+      siteHeader.style.setProperty("--mobile-menu-progress", "1");
+    }
+  } else {
+    siteHeader.style.setProperty("--mobile-menu-progress", "1");
+  }
 }
+
+function getHeaderOffset() {
+  const headerBar = siteHeader?.querySelector(".site-header-bar");
+  const headerHeight = headerBar?.getBoundingClientRect().height ?? 0;
+  const headerTopPadding = siteHeader ? parseFloat(getComputedStyle(siteHeader).paddingTop) || 0 : 0;
+  return headerHeight + headerTopPadding + 16;
+}
+
+function scrollToSection(targetId) {
+  const target = document.getElementById(targetId);
+
+  if (!target) {
+    return;
+  }
+
+  const offset = getHeaderOffset();
+  const targetTop = target.getBoundingClientRect().top + window.scrollY;
+  const nextTop = Math.max(targetTop - offset, 0);
+
+  window.scrollTo({
+    top: nextTop,
+    behavior: "smooth"
+  });
+}
+
+navLinks.forEach((link) => {
+  link.addEventListener("click", (event) => {
+    const href = link.getAttribute("href");
+
+    if (!href || href === "#" || !href.startsWith("#")) {
+      return;
+    }
+
+    const targetId = href.slice(1);
+    const target = document.getElementById(targetId);
+
+    if (!target) {
+      return;
+    }
+
+    event.preventDefault();
+
+    siteNav?.classList.remove("open");
+    siteHeader?.classList.remove("mobile-menu-open");
+    menuToggle?.setAttribute("aria-expanded", "false");
+
+    scrollToSection(targetId);
+  });
+});
 
 updateUniverseBackground();
 updateMobileHeaderState();
