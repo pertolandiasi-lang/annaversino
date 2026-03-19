@@ -10,6 +10,7 @@ const closeModalButtons = document.querySelectorAll("[data-close-modal]");
 const contactForm = document.getElementById("contact-form");
 const formNote = document.getElementById("form-note");
 const siteBackground = document.querySelector(".site-background");
+const siteHeader = document.querySelector(".site-header");
 
 const modalContent = {
   mission: {
@@ -167,6 +168,20 @@ function updateUniverseBackground() {
   siteBackground.style.setProperty("--bg-shift", `${offset}px`);
 }
 
+function updateMobileHeaderState() {
+  if (!siteHeader) {
+    return;
+  }
+
+  const isMobile = window.innerWidth <= 760;
+  const isScrolled = window.scrollY > 24;
+
+  siteHeader.classList.toggle("mobile-scrolled", isMobile && isScrolled);
+}
+
 updateUniverseBackground();
+updateMobileHeaderState();
 window.addEventListener("scroll", updateUniverseBackground, { passive: true });
+window.addEventListener("scroll", updateMobileHeaderState, { passive: true });
 window.addEventListener("resize", updateUniverseBackground);
+window.addEventListener("resize", updateMobileHeaderState);
