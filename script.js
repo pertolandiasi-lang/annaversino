@@ -14,6 +14,7 @@ const siteHeader = document.querySelector(".site-header");
 const navLinks = document.querySelectorAll('a[href^="#"]');
 const siteNavLinks = siteNav?.querySelectorAll("a") ?? [];
 let mobileMenuScrollAnchor = 0;
+let mobileMenuMaxDelta = 0;
 let mobileMenuProgress = 1;
 let mobileMenuTargetProgress = 1;
 let mobileMenuAnimationFrame = null;
@@ -63,8 +64,7 @@ function applyMobileMenuProgress(progress) {
     link.style.setProperty("--menu-link-progress", `${easedLinkProgress}`);
   });
 
-  const shellProgress =
-    progress * progress * progress * (progress * (progress * 6 - 15) + 10);
+  const shellProgress = progress * progress * (3 - 2 * progress);
   siteHeader.style.setProperty("--mobile-menu-clip-progress", `${shellProgress}`);
 }
 
@@ -101,7 +101,7 @@ function animateMobileMenuProgress() {
     }
 
     // Ease toward the target for a softer liquid-glass feel.
-    mobileMenuProgress += delta * 0.028;
+    mobileMenuProgress += delta * 0.075;
     applyMobileMenuProgress(mobileMenuProgress);
     mobileMenuAnimationFrame = requestAnimationFrame(tick);
   };
@@ -209,6 +209,7 @@ menuToggle?.addEventListener("click", () => {
 
   if (isOpen && window.innerWidth <= 760) {
     mobileMenuScrollAnchor = window.scrollY;
+    mobileMenuMaxDelta = 0;
     mobileMenuProgress = 1;
     applyMobileMenuProgress(1);
     setMobileMenuTargetProgress(1);
@@ -310,11 +311,14 @@ function updateMobileHeaderState() {
     mobileMenuTargetProgress = 1;
     applyMobileMenuProgress(1);
     mobileMenuScrollAnchor = 0;
+    mobileMenuMaxDelta = 0;
     return;
   }
 
   if (isMobile && siteNav?.classList.contains("open")) {
-    const menuDelta = Math.max(window.scrollY - mobileMenuScrollAnchor, 0);
+    const currentDelta = Math.max(window.scrollY - mobileMenuScrollAnchor, 0);
+    mobileMenuMaxDelta = Math.max(mobileMenuMaxDelta, currentDelta);
+    const menuDelta = mobileMenuMaxDelta;
     const rawProgress = Math.max(0, 1 - Math.min(menuDelta / collapseDistance, 1));
     const menuProgress = rawProgress * rawProgress * (3 - 2 * rawProgress);
     setMobileMenuTargetProgress(menuProgress);
