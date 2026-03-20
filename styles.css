@@ -998,12 +998,13 @@ h3 {
     pointer-events: none;
     transform: translateY(-10px) scale(0.985);
     transform-origin: center top;
-    will-change: max-height, opacity, margin-top, padding-top, transform;
+    clip-path: inset(0 0 100% 0);
+    will-change: clip-path, opacity, margin-top, padding-top, transform;
   }
 
   .site-nav.open {
     display: flex;
-    max-height: calc(420px * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)));
+    max-height: 420px;
     opacity: 1;
     margin-top: calc(8px * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)));
     padding-top: calc(4px * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)));
@@ -1011,6 +1012,12 @@ h3 {
     transform:
       translateY(calc(-10px + (10px * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)))))
       scale(calc(0.985 + (0.015 * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)))));
+    clip-path: inset(
+      0 0
+      calc((1 - var(--mobile-menu-clip-progress, var(--mobile-menu-progress))) * 100%)
+      0
+      round 0 0 24px 24px
+    );
     -webkit-mask-image: linear-gradient(
       to bottom,
       rgba(0, 0, 0, 1) 0,
