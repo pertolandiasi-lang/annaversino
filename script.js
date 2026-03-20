@@ -72,24 +72,33 @@ function applyMobileMenuProgress(progress) {
   const totalLinks = siteNavLinks.length;
   const collapse = 1 - progress;
   let stackedVisibility = 0;
-  const dissolvePhase = Math.max(0, Math.min((collapse - 0.56) / 0.44, 1));
+  let bottomLinkProgress = 1;
+  const dissolvePhase = Math.max(0, Math.min((collapse - 0.52) / 0.48, 1));
 
   siteNavLinks.forEach((link, index) => {
     const fromBottom = totalLinks - 1 - index;
-    const start = fromBottom * 0.1;
-    const end = Math.min(start + 0.34, 1);
+    const start = fromBottom * 0.08;
+    const end = Math.min(start + (fromBottom === 0 ? 0.62 : 0.52), 1);
     const rawLinkProgress =
       1 - Math.max(0, Math.min((dissolvePhase - start) / (end - start || 1), 1));
-    const easedLinkProgress = rawLinkProgress * rawLinkProgress * (3 - 2 * rawLinkProgress);
+    const easedLinkProgress =
+      rawLinkProgress * rawLinkProgress * (rawLinkProgress * (rawLinkProgress * 6 - 15) + 10);
 
     link.style.setProperty("--menu-link-progress", `${easedLinkProgress}`);
     stackedVisibility += easedLinkProgress;
+
+    if (fromBottom === 0) {
+      bottomLinkProgress = easedLinkProgress;
+    }
   });
 
   const stackAverage =
     totalLinks > 0 ? Math.max(0, Math.min(stackedVisibility / totalLinks, 1)) : progress;
-  const shellProgress = Math.max(0, Math.min(stackAverage * 0.94 + progress * 0.06, 1));
-  const fadeZone = dissolvePhase <= 0 ? 0 : 32 + dissolvePhase * 180;
+  const shellProgress = Math.max(
+    0,
+    Math.min(stackAverage * 0.82 + bottomLinkProgress * 0.16 + progress * 0.02, 1)
+  );
+  const fadeZone = dissolvePhase <= 0 ? 0 : 84 + dissolvePhase * 220;
 
   siteHeader.style.setProperty("--mobile-menu-fade-zone", `${fadeZone}px`);
   siteHeader.style.setProperty("--mobile-menu-clip-progress", `${shellProgress}`);
