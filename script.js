@@ -48,12 +48,12 @@ function applyMobileMenuProgress(progress) {
   }
 
   siteHeader.style.setProperty("--mobile-menu-progress", `${progress}`);
-  siteHeader.style.setProperty("--mobile-menu-clip-progress", `${progress}`);
   const fadeZone = progress >= 0.999 ? 0 : 14 + (1 - progress) * 168;
   siteHeader.style.setProperty("--mobile-menu-fade-zone", `${fadeZone}px`);
 
   const totalLinks = siteNavLinks.length;
   const collapse = 1 - progress;
+  let stackedVisibility = 0;
 
   siteNavLinks.forEach((link, index) => {
     const fromBottom = totalLinks - 1 - index;
@@ -63,7 +63,12 @@ function applyMobileMenuProgress(progress) {
     const easedLinkProgress = rawLinkProgress * rawLinkProgress * (3 - 2 * rawLinkProgress);
 
     link.style.setProperty("--menu-link-progress", `${easedLinkProgress}`);
+    stackedVisibility += easedLinkProgress;
   });
+
+  const stackProgress =
+    totalLinks > 0 ? Math.max(0, Math.min(stackedVisibility / totalLinks, 1)) : progress;
+  siteHeader.style.setProperty("--mobile-menu-clip-progress", `${stackProgress}`);
 }
 
 function stopMobileMenuAnimation() {
