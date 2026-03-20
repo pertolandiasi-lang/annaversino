@@ -1004,7 +1004,7 @@ h3 {
 
   .site-nav.open {
     display: flex;
-    max-height: 420px;
+    max-height: calc(var(--mobile-menu-open-height, 420px) * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)));
     opacity: 1;
     margin-top: calc(8px * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)));
     padding-top: calc(4px * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)));
@@ -1037,8 +1037,8 @@ h3 {
     text-align: center;
     opacity: var(--menu-link-progress, 1);
     transform:
-      translateY(calc((1 - var(--menu-link-progress, 1)) * -14px))
-      scale(calc(0.96 + (0.04 * var(--menu-link-progress, 1))));
+      translateY(calc((1 - var(--menu-link-progress, 1)) * -6px))
+      scale(calc(0.985 + (0.015 * var(--menu-link-progress, 1))));
     will-change: opacity, transform;
   }
 

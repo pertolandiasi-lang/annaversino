@@ -14,10 +14,27 @@ const siteHeader = document.querySelector(".site-header");
 const navLinks = document.querySelectorAll('a[href^="#"]');
 const siteNavLinks = siteNav?.querySelectorAll("a") ?? [];
 let mobileMenuScrollAnchor = 0;
-let mobileMenuMaxDelta = 0;
 let mobileMenuProgress = 1;
 let mobileMenuTargetProgress = 1;
 let mobileMenuAnimationFrame = null;
+
+function syncMobileMenuHeight() {
+  if (!siteHeader || !siteNav) {
+    return;
+  }
+
+  const wasOpen = siteNav.classList.contains("open");
+
+  if (!wasOpen) {
+    siteNav.classList.add("open");
+  }
+
+  siteHeader.style.setProperty("--mobile-menu-open-height", `${siteNav.scrollHeight}px`);
+
+  if (!wasOpen) {
+    siteNav.classList.remove("open");
+  }
+}
 
 if ("scrollRestoration" in window.history) {
   window.history.scrollRestoration = "manual";
@@ -40,8 +57,11 @@ function forcePageTop() {
 }
 
 document.addEventListener("DOMContentLoaded", forcePageTop);
+document.addEventListener("DOMContentLoaded", syncMobileMenuHeight);
 window.addEventListener("load", forcePageTop);
+window.addEventListener("load", syncMobileMenuHeight);
 window.addEventListener("pageshow", forcePageTop);
+window.addEventListener("pageshow", syncMobileMenuHeight);
 
 function applyMobileMenuProgress(progress) {
   if (!siteHeader) {
@@ -49,22 +69,29 @@ function applyMobileMenuProgress(progress) {
   }
 
   siteHeader.style.setProperty("--mobile-menu-progress", `${progress}`);
-  const fadeZone = progress >= 0.999 ? 0 : 14 + (1 - progress) * 168;
-  siteHeader.style.setProperty("--mobile-menu-fade-zone", `${fadeZone}px`);
-
   const totalLinks = siteNavLinks.length;
   const collapse = 1 - progress;
+  let stackedVisibility = 0;
+  const dissolvePhase = Math.max(0, Math.min((collapse - 0.56) / 0.44, 1));
+
   siteNavLinks.forEach((link, index) => {
     const fromBottom = totalLinks - 1 - index;
-    const start = fromBottom * 0.085;
-    const end = Math.min(start + 0.32, 1);
-    const rawLinkProgress = 1 - Math.max(0, Math.min((collapse - start) / (end - start || 1), 1));
+    const start = fromBottom * 0.1;
+    const end = Math.min(start + 0.34, 1);
+    const rawLinkProgress =
+      1 - Math.max(0, Math.min((dissolvePhase - start) / (end - start || 1), 1));
     const easedLinkProgress = rawLinkProgress * rawLinkProgress * (3 - 2 * rawLinkProgress);
 
     link.style.setProperty("--menu-link-progress", `${easedLinkProgress}`);
+    stackedVisibility += easedLinkProgress;
   });
 
-  const shellProgress = progress * progress * (3 - 2 * progress);
+  const stackAverage =
+    totalLinks > 0 ? Math.max(0, Math.min(stackedVisibility / totalLinks, 1)) : progress;
+  const shellProgress = Math.max(0, Math.min(stackAverage * 0.94 + progress * 0.06, 1));
+  const fadeZone = dissolvePhase <= 0 ? 0 : 32 + dissolvePhase * 180;
+
+  siteHeader.style.setProperty("--mobile-menu-fade-zone", `${fadeZone}px`);
   siteHeader.style.setProperty("--mobile-menu-clip-progress", `${shellProgress}`);
 }
 
@@ -88,13 +115,13 @@ function animateMobileMenuProgress() {
       applyMobileMenuProgress(mobileMenuProgress);
       mobileMenuAnimationFrame = null;
 
-      if (mobileMenuProgress <= 0 && siteNav?.classList.contains("open")) {
+      if (mobileMenuProgress <= 0.01 && siteNav?.classList.contains("open")) {
         siteNav.classList.remove("open");
         siteHeader?.classList.remove("mobile-menu-open");
         menuToggle?.setAttribute("aria-expanded", "false");
-        mobileMenuProgress = 1;
-        mobileMenuTargetProgress = 1;
-        applyMobileMenuProgress(1);
+        mobileMenuProgress = 0;
+        mobileMenuTargetProgress = 0;
+        applyMobileMenuProgress(0);
       }
 
       return;
@@ -209,7 +236,6 @@ menuToggle?.addEventListener("click", () => {
 
   if (isOpen && window.innerWidth <= 760) {
     mobileMenuScrollAnchor = window.scrollY;
-    mobileMenuMaxDelta = 0;
     mobileMenuProgress = 1;
     applyMobileMenuProgress(1);
     setMobileMenuTargetProgress(1);
@@ -311,14 +337,11 @@ function updateMobileHeaderState() {
     mobileMenuTargetProgress = 1;
     applyMobileMenuProgress(1);
     mobileMenuScrollAnchor = 0;
-    mobileMenuMaxDelta = 0;
     return;
   }
 
   if (isMobile && siteNav?.classList.contains("open")) {
-    const currentDelta = Math.max(window.scrollY - mobileMenuScrollAnchor, 0);
-    mobileMenuMaxDelta = Math.max(mobileMenuMaxDelta, currentDelta);
-    const menuDelta = mobileMenuMaxDelta;
+    const menuDelta = Math.max(window.scrollY - mobileMenuScrollAnchor, 0);
     const rawProgress = Math.max(0, 1 - Math.min(menuDelta / collapseDistance, 1));
     const menuProgress = rawProgress * rawProgress * (3 - 2 * rawProgress);
     setMobileMenuTargetProgress(menuProgress);
