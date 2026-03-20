@@ -13,6 +13,96 @@ const siteBackground = document.querySelector(".site-background");
 const siteHeader = document.querySelector(".site-header");
 const navLinks = document.querySelectorAll('a[href^="#"]');
 let mobileMenuScrollAnchor = 0;
+let mobileMenuProgress = 1;
+let mobileMenuTargetProgress = 1;
+let mobileMenuAnimationFrame = null;
+
+if ("scrollRestoration" in window.history) {
+  window.history.scrollRestoration = "manual";
+}
+
+function forcePageTop() {
+  if (window.location.hash) {
+    history.replaceState(null, "", window.location.pathname + window.location.search);
+  }
+
+  window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", forcePageTop);
+window.addEventListener("load", forcePageTop);
+window.addEventListener("pageshow", forcePageTop);
+
+function applyMobileMenuProgress(progress) {
+  if (!siteHeader) {
+    return;
+  }
+
+  siteHeader.style.setProperty("--mobile-menu-progress", `${progress}`);
+}
+
+function stopMobileMenuAnimation() {
+  if (mobileMenuAnimationFrame !== null) {
+    cancelAnimationFrame(mobileMenuAnimationFrame);
+    mobileMenuAnimationFrame = null;
+  }
+}
+
+function animateMobileMenuProgress() {
+  if (mobileMenuAnimationFrame !== null) {
+    return;
+  }
+
+  const tick = () => {
+    const delta = mobileMenuTargetProgress - mobileMenuProgress;
+
+    if (Math.abs(delta) < 0.0015) {
+      mobileMenuProgress = mobileMenuTargetProgress;
+      applyMobileMenuProgress(mobileMenuProgress);
+      mobileMenuAnimationFrame = null;
+
+      if (mobileMenuProgress <= 0 && siteNav?.classList.contains("open")) {
+        siteNav.classList.remove("open");
+        siteHeader?.classList.remove("mobile-menu-open");
+        menuToggle?.setAttribute("aria-expanded", "false");
+        mobileMenuProgress = 1;
+        mobileMenuTargetProgress = 1;
+        applyMobileMenuProgress(1);
+      }
+
+      return;
+    }
+
+    // Ease toward the target for a softer liquid-glass feel.
+    mobileMenuProgress += delta * 0.14;
+    applyMobileMenuProgress(mobileMenuProgress);
+    mobileMenuAnimationFrame = requestAnimationFrame(tick);
+  };
+
+  mobileMenuAnimationFrame = requestAnimationFrame(tick);
+}
+
+function setMobileMenuTargetProgress(progress) {
+  mobileMenuTargetProgress = Math.max(0, Math.min(progress, 1));
+
+  if (window.innerWidth > 760) {
+    mobileMenuProgress = 1;
+    mobileMenuTargetProgress = 1;
+    applyMobileMenuProgress(1);
+    stopMobileMenuAnimation();
+    return;
+  }
+
+  animateMobileMenuProgress();
+}
 
 const modalContent = {
   mission: {
@@ -100,7 +190,11 @@ menuToggle?.addEventListener("click", () => {
 
   if (isOpen && window.innerWidth <= 760) {
     mobileMenuScrollAnchor = window.scrollY;
-    siteHeader?.style.setProperty("--mobile-menu-progress", "1");
+    mobileMenuProgress = 1;
+    applyMobileMenuProgress(1);
+    setMobileMenuTargetProgress(1);
+  } else if (!isOpen) {
+    setMobileMenuTargetProgress(1);
   }
 });
 
@@ -192,24 +286,21 @@ function updateMobileHeaderState() {
     siteHeader.classList.remove("mobile-menu-open");
     siteNav?.classList.remove("open");
     menuToggle?.setAttribute("aria-expanded", "false");
-    siteHeader.style.setProperty("--mobile-menu-progress", "1");
+    stopMobileMenuAnimation();
+    mobileMenuProgress = 1;
+    mobileMenuTargetProgress = 1;
+    applyMobileMenuProgress(1);
     mobileMenuScrollAnchor = 0;
+    return;
   }
 
   if (isMobile && siteNav?.classList.contains("open")) {
     const menuDelta = Math.max(window.scrollY - mobileMenuScrollAnchor, 0);
-    const menuProgress = Math.max(0, 1 - Math.min(menuDelta / collapseDistance, 1));
-
-    siteHeader.style.setProperty("--mobile-menu-progress", `${menuProgress}`);
-
-    if (menuProgress === 0) {
-      siteNav.classList.remove("open");
-      siteHeader.classList.remove("mobile-menu-open");
-      menuToggle?.setAttribute("aria-expanded", "false");
-      siteHeader.style.setProperty("--mobile-menu-progress", "1");
-    }
+    const rawProgress = Math.max(0, 1 - Math.min(menuDelta / collapseDistance, 1));
+    const menuProgress = rawProgress * rawProgress * (3 - 2 * rawProgress);
+    setMobileMenuTargetProgress(menuProgress);
   } else {
-    siteHeader.style.setProperty("--mobile-menu-progress", "1");
+    setMobileMenuTargetProgress(1);
   }
 }
 
@@ -257,6 +348,7 @@ navLinks.forEach((link) => {
     siteNav?.classList.remove("open");
     siteHeader?.classList.remove("mobile-menu-open");
     menuToggle?.setAttribute("aria-expanded", "false");
+    setMobileMenuTargetProgress(1);
 
     scrollToSection(targetId);
   });
