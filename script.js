@@ -48,20 +48,19 @@ function applyMobileMenuProgress(progress) {
   }
 
   siteHeader.style.setProperty("--mobile-menu-progress", `${progress}`);
-  const clipProgress = 1 - Math.pow(1 - progress, 3);
-  siteHeader.style.setProperty("--mobile-menu-clip-progress", `${clipProgress}`);
+  siteHeader.style.setProperty("--mobile-menu-clip-progress", `${progress}`);
   const fadeZone = progress >= 0.999 ? 0 : 14 + (1 - progress) * 168;
   siteHeader.style.setProperty("--mobile-menu-fade-zone", `${fadeZone}px`);
 
   const totalLinks = siteNavLinks.length;
+  const collapse = 1 - progress;
 
   siteNavLinks.forEach((link, index) => {
     const fromBottom = totalLinks - 1 - index;
-    const threshold = Math.min(0.72, fromBottom * 0.085);
-    const span = Math.max(0.18, 0.92 - threshold);
-    const rawLinkProgress = Math.max(0, Math.min((progress - threshold) / span, 1));
-    const easedLinkProgress =
-      rawLinkProgress * rawLinkProgress * (3 - 2 * rawLinkProgress);
+    const start = fromBottom * 0.085;
+    const end = Math.min(start + 0.32, 1);
+    const rawLinkProgress = 1 - Math.max(0, Math.min((collapse - start) / (end - start || 1), 1));
+    const easedLinkProgress = rawLinkProgress * rawLinkProgress * (3 - 2 * rawLinkProgress);
 
     link.style.setProperty("--menu-link-progress", `${easedLinkProgress}`);
   });
