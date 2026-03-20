@@ -1004,7 +1004,7 @@ h3 {
   .site-nav.open {
     display: flex;
     max-height: calc(420px * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)));
-    opacity: var(--mobile-menu-progress);
+    opacity: 1;
     margin-top: calc(8px * var(--mobile-menu-progress));
     padding-top: calc(4px * var(--mobile-menu-progress));
     pointer-events: auto;
