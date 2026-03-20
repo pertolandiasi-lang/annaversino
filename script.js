@@ -68,7 +68,7 @@ function applyMobileMenuProgress(progress) {
 
   const stackProgress =
     totalLinks > 0 ? Math.max(0, Math.min(stackedVisibility / totalLinks, 1)) : progress;
-  const shellProgress = Math.max(0, Math.min(stackProgress * 0.78 + progress * 0.22, 1));
+  const shellProgress = Math.max(0, Math.min(stackProgress * 0.84 + progress * 0.16, 1));
   siteHeader.style.setProperty("--mobile-menu-clip-progress", `${shellProgress}`);
 }
 
@@ -105,7 +105,7 @@ function animateMobileMenuProgress() {
     }
 
     // Ease toward the target for a softer liquid-glass feel.
-    mobileMenuProgress += delta * 0.14;
+    mobileMenuProgress += delta * 0.095;
     applyMobileMenuProgress(mobileMenuProgress);
     mobileMenuAnimationFrame = requestAnimationFrame(tick);
   };
