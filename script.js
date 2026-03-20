@@ -12,6 +12,7 @@ const formNote = document.getElementById("form-note");
 const siteBackground = document.querySelector(".site-background");
 const siteHeader = document.querySelector(".site-header");
 const navLinks = document.querySelectorAll('a[href^="#"]');
+const siteNavLinks = siteNav?.querySelectorAll("a") ?? [];
 let mobileMenuScrollAnchor = 0;
 let mobileMenuProgress = 1;
 let mobileMenuTargetProgress = 1;
@@ -47,6 +48,21 @@ function applyMobileMenuProgress(progress) {
   }
 
   siteHeader.style.setProperty("--mobile-menu-progress", `${progress}`);
+  const fadeZone = 42 + (1 - progress) * 132;
+  siteHeader.style.setProperty("--mobile-menu-fade-zone", `${fadeZone}px`);
+
+  const totalLinks = siteNavLinks.length;
+
+  siteNavLinks.forEach((link, index) => {
+    const fromBottom = totalLinks - 1 - index;
+    const threshold = Math.min(0.64, fromBottom * 0.06);
+    const span = Math.max(0.2, 1 - threshold);
+    const rawLinkProgress = Math.max(0, Math.min((progress - threshold) / span, 1));
+    const easedLinkProgress =
+      rawLinkProgress * rawLinkProgress * (3 - 2 * rawLinkProgress);
+
+    link.style.setProperty("--menu-link-progress", `${easedLinkProgress}`);
+  });
 }
 
 function stopMobileMenuAnimation() {
