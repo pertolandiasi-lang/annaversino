@@ -48,6 +48,8 @@ function applyMobileMenuProgress(progress) {
   }
 
   siteHeader.style.setProperty("--mobile-menu-progress", `${progress}`);
+  const clipProgress = 1 - Math.pow(1 - progress, 3);
+  siteHeader.style.setProperty("--mobile-menu-clip-progress", `${clipProgress}`);
   const fadeZone = 42 + (1 - progress) * 132;
   siteHeader.style.setProperty("--mobile-menu-fade-zone", `${fadeZone}px`);
 

@@ -1003,7 +1003,7 @@ h3 {
 
   .site-nav.open {
     display: flex;
-    max-height: calc(420px * var(--mobile-menu-progress));
+    max-height: calc(420px * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)));
     opacity: var(--mobile-menu-progress);
     margin-top: calc(8px * var(--mobile-menu-progress));
     padding-top: calc(4px * var(--mobile-menu-progress));
@@ -1032,8 +1032,7 @@ h3 {
     transform:
       translateY(calc((1 - var(--menu-link-progress, 1)) * -14px))
       scale(calc(0.96 + (0.04 * var(--menu-link-progress, 1))));
-    filter: blur(calc((1 - var(--menu-link-progress, 1)) * 4px));
-    will-change: opacity, transform, filter;
+    will-change: opacity, transform;
   }
 
   .site-header.mobile-menu-open .mobile-nav-preview {
