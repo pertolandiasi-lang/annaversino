@@ -1005,12 +1005,12 @@ h3 {
     display: flex;
     max-height: calc(420px * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)));
     opacity: 1;
-    margin-top: calc(8px * var(--mobile-menu-progress));
-    padding-top: calc(4px * var(--mobile-menu-progress));
+    margin-top: calc(8px * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)));
+    padding-top: calc(4px * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)));
     pointer-events: auto;
     transform:
-      translateY(calc(-10px + (10px * var(--mobile-menu-progress))))
-      scale(calc(0.985 + (0.015 * var(--mobile-menu-progress))));
+      translateY(calc(-10px + (10px * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)))))
+      scale(calc(0.985 + (0.015 * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)))));
     -webkit-mask-image: linear-gradient(
       to bottom,
       rgba(0, 0, 0, 1) 0,

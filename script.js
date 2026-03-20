@@ -68,7 +68,8 @@ function applyMobileMenuProgress(progress) {
 
   const stackProgress =
     totalLinks > 0 ? Math.max(0, Math.min(stackedVisibility / totalLinks, 1)) : progress;
-  siteHeader.style.setProperty("--mobile-menu-clip-progress", `${stackProgress}`);
+  const shellProgress = Math.max(0, Math.min(stackProgress * 0.78 + progress * 0.22, 1));
+  siteHeader.style.setProperty("--mobile-menu-clip-progress", `${shellProgress}`);
 }
 
 function stopMobileMenuAnimation() {
