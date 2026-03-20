@@ -63,7 +63,8 @@ function applyMobileMenuProgress(progress) {
     link.style.setProperty("--menu-link-progress", `${easedLinkProgress}`);
   });
 
-  const shellProgress = progress * progress * (3 - 2 * progress);
+  const shellProgress =
+    progress * progress * progress * (progress * (progress * 6 - 15) + 10);
   siteHeader.style.setProperty("--mobile-menu-clip-progress", `${shellProgress}`);
 }
 
@@ -100,7 +101,7 @@ function animateMobileMenuProgress() {
     }
 
     // Ease toward the target for a softer liquid-glass feel.
-    mobileMenuProgress += delta * 0.045;
+    mobileMenuProgress += delta * 0.028;
     applyMobileMenuProgress(mobileMenuProgress);
     mobileMenuAnimationFrame = requestAnimationFrame(tick);
   };
