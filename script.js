@@ -53,8 +53,6 @@ function applyMobileMenuProgress(progress) {
 
   const totalLinks = siteNavLinks.length;
   const collapse = 1 - progress;
-  let stackedVisibility = 0;
-
   siteNavLinks.forEach((link, index) => {
     const fromBottom = totalLinks - 1 - index;
     const start = fromBottom * 0.085;
@@ -63,12 +61,9 @@ function applyMobileMenuProgress(progress) {
     const easedLinkProgress = rawLinkProgress * rawLinkProgress * (3 - 2 * rawLinkProgress);
 
     link.style.setProperty("--menu-link-progress", `${easedLinkProgress}`);
-    stackedVisibility += easedLinkProgress;
   });
 
-  const stackProgress =
-    totalLinks > 0 ? Math.max(0, Math.min(stackedVisibility / totalLinks, 1)) : progress;
-  const shellProgress = Math.max(0, Math.min(stackProgress * 0.94 + progress * 0.06, 1));
+  const shellProgress = progress * progress * (3 - 2 * progress);
   siteHeader.style.setProperty("--mobile-menu-clip-progress", `${shellProgress}`);
 }
 
