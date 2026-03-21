@@ -19,6 +19,9 @@ let mobileMenuTargetProgress = 1;
 let mobileMenuAnimationFrame = null;
 let mobileMenuOpenHeight = 0;
 let mobileMenuLinkMetrics = [];
+const MOBILE_MENU_ROW_HEIGHT = 58;
+const MOBILE_MENU_ROW_VISIBLE_HEIGHT = 54;
+const MOBILE_MENU_VERTICAL_PADDING = 16;
 
 if ("scrollRestoration" in window.history) {
   window.history.scrollRestoration = "manual";
@@ -72,11 +75,24 @@ function syncMobileMenuMetrics() {
   siteNav.style.pointerEvents = "auto";
   siteNav.style.overflow = "visible";
 
-  mobileMenuLinkMetrics = Array.from(siteNavLinks, (link) => ({
+  const measuredMetrics = Array.from(siteNavLinks, (link, index) => ({
     top: link.offsetTop,
-    height: link.offsetHeight
+    height: link.offsetHeight,
+    fallbackTop: index * MOBILE_MENU_ROW_HEIGHT,
+    fallbackHeight: MOBILE_MENU_ROW_VISIBLE_HEIGHT
   }));
-  mobileMenuOpenHeight = siteNav.scrollHeight;
+  const measuredHeight = siteNav.scrollHeight;
+  const estimatedHeight =
+    siteNavLinks.length * MOBILE_MENU_ROW_HEIGHT + MOBILE_MENU_VERTICAL_PADDING;
+  const hasUsableMetrics =
+    measuredHeight > MOBILE_MENU_ROW_VISIBLE_HEIGHT * 3 &&
+    measuredMetrics.some((metric) => metric.height > 0);
+
+  mobileMenuLinkMetrics = measuredMetrics.map((metric) => ({
+    top: hasUsableMetrics && metric.height > 0 ? metric.top : metric.fallbackTop,
+    height: hasUsableMetrics && metric.height > 0 ? metric.height : metric.fallbackHeight
+  }));
+  mobileMenuOpenHeight = hasUsableMetrics ? measuredHeight : estimatedHeight;
 
   siteHeader.style.setProperty("--mobile-menu-open-height", `${mobileMenuOpenHeight}px`);
   siteHeader.style.setProperty("--mobile-menu-current-height", `${mobileMenuOpenHeight}px`);
