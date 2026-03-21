@@ -19,15 +19,6 @@ let mobileMenuTargetProgress = 1;
 let mobileMenuAnimationFrame = null;
 let mobileMenuOpenHeight = 0;
 let mobileMenuLinkMetrics = [];
-let mobileMenuGestureOffset = 0;
-let mobileMenuTouchY = null;
-const MOBILE_MENU_ROW_HEIGHT = 58;
-const MOBILE_MENU_ROW_VISIBLE_HEIGHT = 54;
-const MOBILE_MENU_FIRST_ROW_MARGIN = 4;
-const MOBILE_MENU_ROW_MARGIN = 10;
-const MOBILE_MENU_TOP_PADDING = 34;
-const MOBILE_MENU_BOTTOM_PADDING = 16;
-const MOBILE_MENU_COLLAPSE_DISTANCE = 120;
 
 if ("scrollRestoration" in window.history) {
   window.history.scrollRestoration = "manual";
@@ -59,11 +50,6 @@ function syncMobileMenuMetrics() {
   }
 
   const wasOpen = siteNav.classList.contains("open");
-  const previousInlineMaxHeight = siteNav.style.maxHeight;
-  const previousInlineOpacity = siteNav.style.opacity;
-  const previousInlineTransform = siteNav.style.transform;
-  const previousInlinePointerEvents = siteNav.style.pointerEvents;
-  const previousInlineOverflow = siteNav.style.overflow;
 
   if (!wasOpen) {
     siteNav.classList.add("open");
@@ -75,43 +61,13 @@ function syncMobileMenuMetrics() {
     link.style.setProperty("--menu-link-progress", "1");
   });
 
-  siteNav.style.maxHeight = "none";
-  siteNav.style.opacity = "1";
-  siteNav.style.transform = "none";
-  siteNav.style.pointerEvents = "auto";
-  siteNav.style.overflow = "visible";
-
-  const measuredMetrics = Array.from(siteNavLinks, (link, index) => ({
+  mobileMenuLinkMetrics = Array.from(siteNavLinks, (link) => ({
     top: link.offsetTop,
-    height: link.offsetHeight,
-    fallbackTop: index * MOBILE_MENU_ROW_HEIGHT,
-    fallbackHeight: MOBILE_MENU_ROW_VISIBLE_HEIGHT
+    height: link.offsetHeight
   }));
-  const measuredHeight = siteNav.scrollHeight;
-  const estimatedHeight =
-    MOBILE_MENU_TOP_PADDING +
-    MOBILE_MENU_BOTTOM_PADDING +
-    siteNavLinks.length * MOBILE_MENU_ROW_VISIBLE_HEIGHT +
-    MOBILE_MENU_FIRST_ROW_MARGIN +
-    Math.max(siteNavLinks.length - 1, 0) * MOBILE_MENU_ROW_MARGIN;
-  const hasUsableMetrics =
-    measuredHeight > MOBILE_MENU_ROW_VISIBLE_HEIGHT * 3 &&
-    measuredMetrics.some((metric) => metric.height > 0);
-
-  mobileMenuLinkMetrics = measuredMetrics.map((metric) => ({
-    top: hasUsableMetrics && metric.height > 0 ? metric.top : metric.fallbackTop,
-    height: hasUsableMetrics && metric.height > 0 ? metric.height : metric.fallbackHeight
-  }));
-  mobileMenuOpenHeight = hasUsableMetrics ? Math.max(measuredHeight, estimatedHeight) : estimatedHeight;
+  mobileMenuOpenHeight = siteNav.scrollHeight;
 
   siteHeader.style.setProperty("--mobile-menu-open-height", `${mobileMenuOpenHeight}px`);
-  siteHeader.style.setProperty("--mobile-menu-current-height", `${mobileMenuOpenHeight}px`);
-
-  siteNav.style.maxHeight = previousInlineMaxHeight;
-  siteNav.style.opacity = previousInlineOpacity;
-  siteNav.style.transform = previousInlineTransform;
-  siteNav.style.pointerEvents = previousInlinePointerEvents;
-  siteNav.style.overflow = previousInlineOverflow;
 
   if (!wasOpen) {
     siteNav.classList.remove("open");
@@ -125,29 +81,12 @@ function invalidateMobileMenuMetrics() {
   mobileMenuLinkMetrics = [];
 }
 
-function isMobileMenuOpen() {
-  return window.innerWidth <= 760 && !!siteNav?.classList.contains("open");
-}
-
-function updateBodyScrollLock() {
-  const modalOpen = !!modal && !modal.classList.contains("hidden");
-  document.body.style.overflow = modalOpen || isMobileMenuOpen() ? "hidden" : "";
-}
-
 function applyMobileMenuProgress(progress) {
   if (!siteHeader) {
     return;
   }
 
   siteHeader.style.setProperty("--mobile-menu-progress", `${progress}`);
-
-  if (progress <= 0.001) {
-    siteHeader.style.setProperty("--mobile-menu-current-height", "0px");
-    siteNavLinks.forEach((link) => {
-      link.style.setProperty("--menu-link-progress", "0");
-    });
-    return;
-  }
 
   if (!mobileMenuOpenHeight || mobileMenuLinkMetrics.length !== siteNavLinks.length) {
     syncMobileMenuMetrics();
@@ -194,7 +133,7 @@ function applyMobileMenuProgress(progress) {
 
   const currentHeight = Math.max(
     0,
-    Math.min(mobileMenuOpenHeight, lastVisibleBottom + MOBILE_MENU_BOTTOM_PADDING + 8 * progress)
+    Math.min(mobileMenuOpenHeight, lastVisibleBottom + 8 * progress)
   );
 
   siteHeader.style.setProperty("--mobile-menu-current-height", `${currentHeight}px`);
@@ -205,19 +144,6 @@ function stopMobileMenuAnimation() {
     cancelAnimationFrame(mobileMenuAnimationFrame);
     mobileMenuAnimationFrame = null;
   }
-}
-
-function closeMobileMenu() {
-  stopMobileMenuAnimation();
-  siteNav?.classList.remove("open");
-  siteHeader?.classList.remove("mobile-menu-open");
-  menuToggle?.setAttribute("aria-expanded", "false");
-  mobileMenuGestureOffset = 0;
-  mobileMenuTouchY = null;
-  mobileMenuProgress = 0;
-  mobileMenuTargetProgress = 0;
-  applyMobileMenuProgress(0);
-  updateBodyScrollLock();
 }
 
 function animateMobileMenuProgress() {
@@ -266,31 +192,6 @@ function setMobileMenuTargetProgress(progress) {
   }
 
   animateMobileMenuProgress();
-}
-
-function setMobileMenuGestureProgress(offset) {
-  const clampedOffset = Math.max(0, Math.min(offset, MOBILE_MENU_COLLAPSE_DISTANCE));
-  const rawProgress = 1 - clampedOffset / MOBILE_MENU_COLLAPSE_DISTANCE;
-  const menuProgress = rawProgress * rawProgress * (3 - 2 * rawProgress);
-
-  mobileMenuGestureOffset = clampedOffset;
-  stopMobileMenuAnimation();
-  mobileMenuProgress = menuProgress;
-  mobileMenuTargetProgress = menuProgress;
-  applyMobileMenuProgress(menuProgress);
-
-  if (clampedOffset >= MOBILE_MENU_COLLAPSE_DISTANCE - 0.5) {
-    closeMobileMenu();
-  }
-}
-
-function handleMobileMenuGestureDelta(deltaY) {
-  if (!isMobileMenuOpen()) {
-    return false;
-  }
-
-  setMobileMenuGestureProgress(mobileMenuGestureOffset + deltaY);
-  return true;
 }
 
 const modalContent = {
@@ -364,12 +265,12 @@ function setModalContent(key) {
 function openModal(key) {
   setModalContent(key);
   modal.classList.remove("hidden");
-  updateBodyScrollLock();
+  document.body.style.overflow = "hidden";
 }
 
 function closeModal() {
   modal.classList.add("hidden");
-  updateBodyScrollLock();
+  document.body.style.overflow = "";
 }
 
 menuToggle?.addEventListener("click", () => {
@@ -380,15 +281,13 @@ menuToggle?.addEventListener("click", () => {
   if (isOpen && window.innerWidth <= 760) {
     syncMobileMenuMetrics();
     mobileMenuScrollAnchor = window.scrollY;
-    mobileMenuGestureOffset = 0;
-    mobileMenuTouchY = null;
-    stopMobileMenuAnimation();
-    mobileMenuProgress = 1;
-    mobileMenuTargetProgress = 1;
-    applyMobileMenuProgress(1);
-    updateBodyScrollLock();
+    if (mobileMenuProgress <= 0.01) {
+      mobileMenuProgress = 0;
+      applyMobileMenuProgress(0);
+    }
+    setMobileMenuTargetProgress(1);
   } else if (!isOpen) {
-    closeMobileMenu();
+    setMobileMenuTargetProgress(1);
   }
 });
 
@@ -477,7 +376,9 @@ function updateMobileHeaderState() {
   siteHeader.classList.toggle("mobile-scrolled", isMobile && isScrolled);
 
   if (!isMobile) {
-    closeMobileMenu();
+    siteHeader.classList.remove("mobile-menu-open");
+    siteNav?.classList.remove("open");
+    menuToggle?.setAttribute("aria-expanded", "false");
     stopMobileMenuAnimation();
     mobileMenuProgress = 1;
     mobileMenuTargetProgress = 1;
@@ -487,18 +388,21 @@ function updateMobileHeaderState() {
   }
 
   if (isMobile && siteNav?.classList.contains("open")) {
-    updateBodyScrollLock();
-    return;
-  }
-
-  if (mobileMenuProgress <= 0.01) {
+    if (!mobileMenuOpenHeight || mobileMenuLinkMetrics.length !== siteNavLinks.length) {
+      syncMobileMenuMetrics();
+    }
+    const menuDelta = Math.max(window.scrollY - mobileMenuScrollAnchor, 0);
+    const rawProgress = Math.max(0, 1 - Math.min(menuDelta / collapseDistance, 1));
+    const menuProgress = rawProgress * rawProgress * (3 - 2 * rawProgress);
+    setMobileMenuTargetProgress(menuProgress);
+  } else if (mobileMenuProgress <= 0.01) {
     stopMobileMenuAnimation();
     mobileMenuTargetProgress = 0;
     mobileMenuProgress = 0;
     applyMobileMenuProgress(0);
+  } else {
+    setMobileMenuTargetProgress(1);
   }
-
-  updateBodyScrollLock();
 }
 
 function getHeaderOffset() {
@@ -542,7 +446,10 @@ navLinks.forEach((link) => {
 
     event.preventDefault();
 
-    closeMobileMenu();
+    siteNav?.classList.remove("open");
+    siteHeader?.classList.remove("mobile-menu-open");
+    menuToggle?.setAttribute("aria-expanded", "false");
+    setMobileMenuTargetProgress(1);
 
     scrollToSection(targetId);
   });
@@ -552,60 +459,6 @@ updateUniverseBackground();
 updateMobileHeaderState();
 window.addEventListener("scroll", updateUniverseBackground, { passive: true });
 window.addEventListener("scroll", updateMobileHeaderState, { passive: true });
-window.addEventListener(
-  "wheel",
-  (event) => {
-    if (handleMobileMenuGestureDelta(event.deltaY)) {
-      event.preventDefault();
-    }
-  },
-  { passive: false }
-);
-window.addEventListener(
-  "touchstart",
-  (event) => {
-    if (!isMobileMenuOpen()) {
-      mobileMenuTouchY = null;
-      return;
-    }
-
-    mobileMenuTouchY = event.touches[0]?.clientY ?? null;
-  },
-  { passive: true }
-);
-window.addEventListener(
-  "touchmove",
-  (event) => {
-    if (!isMobileMenuOpen()) {
-      mobileMenuTouchY = null;
-      return;
-    }
-
-    const currentY = event.touches[0]?.clientY;
-
-    if (typeof currentY !== "number") {
-      return;
-    }
-
-    if (mobileMenuTouchY === null) {
-      mobileMenuTouchY = currentY;
-      event.preventDefault();
-      return;
-    }
-
-    const deltaY = mobileMenuTouchY - currentY;
-    mobileMenuTouchY = currentY;
-    handleMobileMenuGestureDelta(deltaY);
-    event.preventDefault();
-  },
-  { passive: false }
-);
-window.addEventListener("touchend", () => {
-  mobileMenuTouchY = null;
-});
-window.addEventListener("touchcancel", () => {
-  mobileMenuTouchY = null;
-});
 window.addEventListener("resize", () => {
   invalidateMobileMenuMetrics();
   updateUniverseBackground();
