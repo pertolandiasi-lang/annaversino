@@ -17,6 +17,8 @@ let mobileMenuScrollAnchor = 0;
 let mobileMenuProgress = 1;
 let mobileMenuTargetProgress = 1;
 let mobileMenuAnimationFrame = null;
+let mobileMenuOpenHeight = 0;
+let mobileMenuLinkMetrics = [];
 
 function syncMobileMenuHeight() {
   if (!siteHeader || !siteNav) {
@@ -29,7 +31,12 @@ function syncMobileMenuHeight() {
     siteNav.classList.add("open");
   }
 
-  siteHeader.style.setProperty("--mobile-menu-open-height", `${siteNav.scrollHeight}px`);
+  mobileMenuOpenHeight = siteNav.scrollHeight;
+  mobileMenuLinkMetrics = Array.from(siteNavLinks).map((link) => ({
+    top: link.offsetTop,
+    height: link.offsetHeight
+  }));
+  siteHeader.style.setProperty("--mobile-menu-open-height", `${mobileMenuOpenHeight}px`);
 
   if (!wasOpen) {
     siteNav.classList.remove("open");
@@ -69,36 +76,50 @@ function applyMobileMenuProgress(progress) {
   }
 
   siteHeader.style.setProperty("--mobile-menu-progress", `${progress}`);
+
+  if (progress >= 0.999) {
+    siteHeader.style.setProperty("--mobile-menu-fade-zone", "0px");
+    siteHeader.style.setProperty("--mobile-menu-clip-progress", "1");
+
+    siteNavLinks.forEach((link) => {
+      link.style.setProperty("--menu-link-progress", "1");
+    });
+
+    return;
+  }
+
   const totalLinks = siteNavLinks.length;
   const collapse = 1 - progress;
-  let stackedVisibility = 0;
-  let bottomLinkProgress = 1;
-  const dissolvePhase = Math.max(0, Math.min((collapse - 0.52) / 0.48, 1));
+  let visibleBottom = 0;
+  const dissolvePhase = collapse;
 
   siteNavLinks.forEach((link, index) => {
     const fromBottom = totalLinks - 1 - index;
     const start = fromBottom * 0.08;
-    const end = Math.min(start + (fromBottom === 0 ? 0.62 : 0.52), 1);
+    const end = Math.min(start + 0.52, 1);
     const rawLinkProgress =
       1 - Math.max(0, Math.min((dissolvePhase - start) / (end - start || 1), 1));
     const easedLinkProgress =
       rawLinkProgress * rawLinkProgress * (rawLinkProgress * (rawLinkProgress * 6 - 15) + 10);
 
     link.style.setProperty("--menu-link-progress", `${easedLinkProgress}`);
-    stackedVisibility += easedLinkProgress;
 
-    if (fromBottom === 0) {
-      bottomLinkProgress = easedLinkProgress;
+    const metrics = mobileMenuLinkMetrics[index];
+
+    if (metrics) {
+      // Keep the shell tied to the bottom-most link continuously,
+      // so items don't get clipped, disappear, then reappear.
+      const linkBottom =
+        metrics.top + metrics.height * (0.12 + 0.88 * easedLinkProgress) + 10;
+      visibleBottom = Math.max(visibleBottom, linkBottom);
     }
   });
 
-  const stackAverage =
-    totalLinks > 0 ? Math.max(0, Math.min(stackedVisibility / totalLinks, 1)) : progress;
-  const shellProgress = Math.max(
-    0,
-    Math.min(stackAverage * 0.82 + bottomLinkProgress * 0.16 + progress * 0.02, 1)
-  );
-  const fadeZone = dissolvePhase <= 0 ? 0 : 84 + dissolvePhase * 220;
+  const shellProgress =
+    mobileMenuOpenHeight > 0
+      ? Math.max(0, Math.min((visibleBottom + 2) / mobileMenuOpenHeight, 1))
+      : progress;
+  const fadeZone = dissolvePhase <= 0 ? 0 : 52 + dissolvePhase * 160;
 
   siteHeader.style.setProperty("--mobile-menu-fade-zone", `${fadeZone}px`);
   siteHeader.style.setProperty("--mobile-menu-clip-progress", `${shellProgress}`);
