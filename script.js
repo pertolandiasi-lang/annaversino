@@ -17,6 +17,8 @@ let mobileMenuScrollAnchor = 0;
 let mobileMenuProgress = 1;
 let mobileMenuTargetProgress = 1;
 let mobileMenuAnimationFrame = null;
+let mobileMenuOpenHeight = 0;
+let mobileMenuLinkMetrics = [];
 
 if ("scrollRestoration" in window.history) {
   window.history.scrollRestoration = "manual";
@@ -42,6 +44,43 @@ document.addEventListener("DOMContentLoaded", forcePageTop);
 window.addEventListener("load", forcePageTop);
 window.addEventListener("pageshow", forcePageTop);
 
+function syncMobileMenuMetrics() {
+  if (!siteNav || !siteHeader || window.innerWidth > 760) {
+    return;
+  }
+
+  const wasOpen = siteNav.classList.contains("open");
+
+  if (!wasOpen) {
+    siteNav.classList.add("open");
+  }
+
+  const previousProgress = mobileMenuProgress;
+  siteHeader.style.setProperty("--mobile-menu-progress", "1");
+  siteNavLinks.forEach((link) => {
+    link.style.setProperty("--menu-link-progress", "1");
+  });
+
+  mobileMenuLinkMetrics = Array.from(siteNavLinks, (link) => ({
+    top: link.offsetTop,
+    height: link.offsetHeight
+  }));
+  mobileMenuOpenHeight = siteNav.scrollHeight;
+
+  siteHeader.style.setProperty("--mobile-menu-open-height", `${mobileMenuOpenHeight}px`);
+
+  if (!wasOpen) {
+    siteNav.classList.remove("open");
+  }
+
+  siteHeader.style.setProperty("--mobile-menu-progress", `${previousProgress}`);
+}
+
+function invalidateMobileMenuMetrics() {
+  mobileMenuOpenHeight = 0;
+  mobileMenuLinkMetrics = [];
+}
+
 function applyMobileMenuProgress(progress) {
   if (!siteHeader) {
     return;
@@ -49,7 +88,16 @@ function applyMobileMenuProgress(progress) {
 
   siteHeader.style.setProperty("--mobile-menu-progress", `${progress}`);
 
+  if (!mobileMenuOpenHeight || mobileMenuLinkMetrics.length !== siteNavLinks.length) {
+    syncMobileMenuMetrics();
+  }
+
   if (progress >= 0.999) {
+    siteHeader.style.setProperty(
+      "--mobile-menu-current-height",
+      `${mobileMenuOpenHeight || siteNav?.scrollHeight || 0}px`
+    );
+
     siteNavLinks.forEach((link) => {
       link.style.setProperty("--menu-link-progress", "1");
     });
@@ -60,18 +108,35 @@ function applyMobileMenuProgress(progress) {
   const totalLinks = siteNavLinks.length;
   const collapse = 1 - progress;
   const dissolvePhase = collapse;
+  let lastVisibleBottom = 0;
 
   siteNavLinks.forEach((link, index) => {
     const fromBottom = totalLinks - 1 - index;
-    const start = fromBottom * 0.08;
-    const end = Math.min(start + 0.52, 1);
+    const start = fromBottom * 0.06;
+    const end = Math.min(start + 0.46, 1);
     const rawLinkProgress =
       1 - Math.max(0, Math.min((dissolvePhase - start) / (end - start || 1), 1));
     const easedLinkProgress =
       rawLinkProgress * rawLinkProgress * (rawLinkProgress * (rawLinkProgress * 6 - 15) + 10);
 
     link.style.setProperty("--menu-link-progress", `${easedLinkProgress}`);
+
+    const metrics = mobileMenuLinkMetrics[index];
+
+    if (!metrics || easedLinkProgress <= 0.001) {
+      return;
+    }
+
+    const visibleBottom = metrics.top + metrics.height * (0.42 + 0.58 * easedLinkProgress);
+    lastVisibleBottom = Math.max(lastVisibleBottom, visibleBottom);
   });
+
+  const currentHeight = Math.max(
+    0,
+    Math.min(mobileMenuOpenHeight, lastVisibleBottom + 8 * progress)
+  );
+
+  siteHeader.style.setProperty("--mobile-menu-current-height", `${currentHeight}px`);
 }
 
 function stopMobileMenuAnimation() {
@@ -214,6 +279,7 @@ menuToggle?.addEventListener("click", () => {
   siteHeader?.classList.toggle("mobile-menu-open", isOpen);
 
   if (isOpen && window.innerWidth <= 760) {
+    syncMobileMenuMetrics();
     mobileMenuScrollAnchor = window.scrollY;
     if (mobileMenuProgress <= 0.01) {
       mobileMenuProgress = 0;
@@ -322,10 +388,18 @@ function updateMobileHeaderState() {
   }
 
   if (isMobile && siteNav?.classList.contains("open")) {
+    if (!mobileMenuOpenHeight || mobileMenuLinkMetrics.length !== siteNavLinks.length) {
+      syncMobileMenuMetrics();
+    }
     const menuDelta = Math.max(window.scrollY - mobileMenuScrollAnchor, 0);
     const rawProgress = Math.max(0, 1 - Math.min(menuDelta / collapseDistance, 1));
     const menuProgress = rawProgress * rawProgress * (3 - 2 * rawProgress);
     setMobileMenuTargetProgress(menuProgress);
+  } else if (mobileMenuProgress <= 0.01) {
+    stopMobileMenuAnimation();
+    mobileMenuTargetProgress = 0;
+    mobileMenuProgress = 0;
+    applyMobileMenuProgress(0);
   } else {
     setMobileMenuTargetProgress(1);
   }
@@ -385,5 +459,8 @@ updateUniverseBackground();
 updateMobileHeaderState();
 window.addEventListener("scroll", updateUniverseBackground, { passive: true });
 window.addEventListener("scroll", updateMobileHeaderState, { passive: true });
-window.addEventListener("resize", updateUniverseBackground);
-window.addEventListener("resize", updateMobileHeaderState);
+window.addEventListener("resize", () => {
+  invalidateMobileMenuMetrics();
+  updateUniverseBackground();
+  updateMobileHeaderState();
+});
