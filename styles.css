@@ -987,7 +987,7 @@ h3 {
   .site-nav {
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 0;
     font-size: 1rem;
     width: 100%;
     padding: 0;
@@ -998,48 +998,40 @@ h3 {
     pointer-events: none;
     transform: translateY(-10px) scale(0.985);
     transform-origin: center top;
-    clip-path: inset(0 0 100% 0);
-    will-change: clip-path, opacity, margin-top, padding-top, transform;
+    will-change: opacity, margin-top, padding-top, transform;
   }
 
   .site-nav.open {
     display: flex;
-    max-height: calc(var(--mobile-menu-open-height, 420px) * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)));
+    max-height: none;
     opacity: 1;
-    margin-top: calc(8px * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)));
-    padding-top: calc(4px * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)));
+    margin-top: calc(8px * var(--mobile-menu-progress));
+    padding-top: calc(4px * var(--mobile-menu-progress));
     pointer-events: auto;
     transform:
-      translateY(calc(-10px + (10px * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)))))
-      scale(calc(0.985 + (0.015 * var(--mobile-menu-clip-progress, var(--mobile-menu-progress)))));
-    clip-path: inset(
-      0 0
-      calc((1 - var(--mobile-menu-clip-progress, var(--mobile-menu-progress))) * 100%)
-      0
-      round 0 0 24px 24px
-    );
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 1) 0,
-      rgba(0, 0, 0, 1) calc(100% - var(--mobile-menu-fade-zone, 48px)),
-      rgba(0, 0, 0, 0) 100%
-    );
-    mask-image: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 1) 0,
-      rgba(0, 0, 0, 1) calc(100% - var(--mobile-menu-fade-zone, 48px)),
-      rgba(0, 0, 0, 0) 100%
-    );
+      translateY(calc(-10px + (10px * var(--mobile-menu-progress))))
+      scale(calc(0.985 + (0.015 * var(--mobile-menu-progress))));
   }
 
   .site-nav.open a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     text-align: center;
+    overflow: hidden;
+    max-height: calc(42px * var(--menu-link-progress, 1));
+    padding-block: calc(6px * var(--menu-link-progress, 1));
+    margin-top: calc(10px * var(--menu-link-progress, 1));
     opacity: var(--menu-link-progress, 1);
     transform:
       translateY(calc((1 - var(--menu-link-progress, 1)) * -2px))
       scale(calc(0.995 + (0.005 * var(--menu-link-progress, 1))));
-    will-change: opacity, transform;
+    will-change: opacity, transform, max-height, padding, margin;
+  }
+
+  .site-nav.open a:first-child {
+    margin-top: calc(4px * var(--menu-link-progress, 1));
   }
 
   .site-header.mobile-menu-open .mobile-nav-preview {

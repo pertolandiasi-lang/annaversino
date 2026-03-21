@@ -17,31 +17,6 @@ let mobileMenuScrollAnchor = 0;
 let mobileMenuProgress = 1;
 let mobileMenuTargetProgress = 1;
 let mobileMenuAnimationFrame = null;
-let mobileMenuOpenHeight = 0;
-let mobileMenuLinkMetrics = [];
-
-function syncMobileMenuHeight() {
-  if (!siteHeader || !siteNav) {
-    return;
-  }
-
-  const wasOpen = siteNav.classList.contains("open");
-
-  if (!wasOpen) {
-    siteNav.classList.add("open");
-  }
-
-  mobileMenuOpenHeight = siteNav.scrollHeight;
-  mobileMenuLinkMetrics = Array.from(siteNavLinks).map((link) => ({
-    top: link.offsetTop,
-    height: link.offsetHeight
-  }));
-  siteHeader.style.setProperty("--mobile-menu-open-height", `${mobileMenuOpenHeight}px`);
-
-  if (!wasOpen) {
-    siteNav.classList.remove("open");
-  }
-}
 
 if ("scrollRestoration" in window.history) {
   window.history.scrollRestoration = "manual";
@@ -64,11 +39,8 @@ function forcePageTop() {
 }
 
 document.addEventListener("DOMContentLoaded", forcePageTop);
-document.addEventListener("DOMContentLoaded", syncMobileMenuHeight);
 window.addEventListener("load", forcePageTop);
-window.addEventListener("load", syncMobileMenuHeight);
 window.addEventListener("pageshow", forcePageTop);
-window.addEventListener("pageshow", syncMobileMenuHeight);
 
 function applyMobileMenuProgress(progress) {
   if (!siteHeader) {
@@ -78,9 +50,6 @@ function applyMobileMenuProgress(progress) {
   siteHeader.style.setProperty("--mobile-menu-progress", `${progress}`);
 
   if (progress >= 0.999) {
-    siteHeader.style.setProperty("--mobile-menu-fade-zone", "0px");
-    siteHeader.style.setProperty("--mobile-menu-clip-progress", "1");
-
     siteNavLinks.forEach((link) => {
       link.style.setProperty("--menu-link-progress", "1");
     });
@@ -90,7 +59,6 @@ function applyMobileMenuProgress(progress) {
 
   const totalLinks = siteNavLinks.length;
   const collapse = 1 - progress;
-  let visibleBottom = 0;
   const dissolvePhase = collapse;
 
   siteNavLinks.forEach((link, index) => {
@@ -103,26 +71,7 @@ function applyMobileMenuProgress(progress) {
       rawLinkProgress * rawLinkProgress * (rawLinkProgress * (rawLinkProgress * 6 - 15) + 10);
 
     link.style.setProperty("--menu-link-progress", `${easedLinkProgress}`);
-
-    const metrics = mobileMenuLinkMetrics[index];
-
-    if (metrics) {
-      // Keep the shell tied to the bottom-most link continuously,
-      // so items don't get clipped, disappear, then reappear.
-      const linkBottom =
-        metrics.top + metrics.height * (0.12 + 0.88 * easedLinkProgress) + 10;
-      visibleBottom = Math.max(visibleBottom, linkBottom);
-    }
   });
-
-  const shellProgress =
-    mobileMenuOpenHeight > 0
-      ? Math.max(0, Math.min((visibleBottom + 2) / mobileMenuOpenHeight, 1))
-      : progress;
-  const fadeZone = dissolvePhase <= 0 ? 0 : 52 + dissolvePhase * 160;
-
-  siteHeader.style.setProperty("--mobile-menu-fade-zone", `${fadeZone}px`);
-  siteHeader.style.setProperty("--mobile-menu-clip-progress", `${shellProgress}`);
 }
 
 function stopMobileMenuAnimation() {
@@ -266,8 +215,10 @@ menuToggle?.addEventListener("click", () => {
 
   if (isOpen && window.innerWidth <= 760) {
     mobileMenuScrollAnchor = window.scrollY;
-    mobileMenuProgress = 1;
-    applyMobileMenuProgress(1);
+    if (mobileMenuProgress <= 0.01) {
+      mobileMenuProgress = 0;
+      applyMobileMenuProgress(0);
+    }
     setMobileMenuTargetProgress(1);
   } else if (!isOpen) {
     setMobileMenuTargetProgress(1);
