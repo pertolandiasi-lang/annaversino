@@ -1009,8 +1009,8 @@ h3 {
     border-top: 0;
     border-radius: 0 0 28px 28px;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04)),
-      rgba(22, 18, 54, 0.72);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05)),
+      rgba(22, 18, 54, 0.9);
     box-shadow:
       0 22px 56px rgba(7, 4, 22, 0.16),
       inset 0 1px 0 rgba(255, 255, 255, 0.14);
@@ -1019,6 +1019,17 @@ h3 {
     transform: translateY(-10px) scale(0.985);
     transform-origin: center top;
     will-change: max-height, opacity, transform;
+  }
+
+  .site-nav::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background:
+      linear-gradient(180deg, rgba(36, 29, 84, 0.96), rgba(28, 22, 72, 0.94)),
+      rgba(18, 14, 48, 0.96);
   }
 
   .site-nav.open {
