@@ -1001,7 +1001,6 @@ h3 {
     transform: translateY(-10px) scale(0.985);
     transform-origin: center top;
     will-change: max-height, opacity, margin-top, padding-top, transform;
-    contain: layout paint;
   }
 
   .site-nav.open {

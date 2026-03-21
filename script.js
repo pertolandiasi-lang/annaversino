@@ -50,6 +50,11 @@ function syncMobileMenuMetrics() {
   }
 
   const wasOpen = siteNav.classList.contains("open");
+  const previousInlineMaxHeight = siteNav.style.maxHeight;
+  const previousInlineOpacity = siteNav.style.opacity;
+  const previousInlineTransform = siteNav.style.transform;
+  const previousInlinePointerEvents = siteNav.style.pointerEvents;
+  const previousInlineOverflow = siteNav.style.overflow;
 
   if (!wasOpen) {
     siteNav.classList.add("open");
@@ -61,6 +66,12 @@ function syncMobileMenuMetrics() {
     link.style.setProperty("--menu-link-progress", "1");
   });
 
+  siteNav.style.maxHeight = "none";
+  siteNav.style.opacity = "1";
+  siteNav.style.transform = "none";
+  siteNav.style.pointerEvents = "auto";
+  siteNav.style.overflow = "visible";
+
   mobileMenuLinkMetrics = Array.from(siteNavLinks, (link) => ({
     top: link.offsetTop,
     height: link.offsetHeight
@@ -68,6 +79,13 @@ function syncMobileMenuMetrics() {
   mobileMenuOpenHeight = siteNav.scrollHeight;
 
   siteHeader.style.setProperty("--mobile-menu-open-height", `${mobileMenuOpenHeight}px`);
+  siteHeader.style.setProperty("--mobile-menu-current-height", `${mobileMenuOpenHeight}px`);
+
+  siteNav.style.maxHeight = previousInlineMaxHeight;
+  siteNav.style.opacity = previousInlineOpacity;
+  siteNav.style.transform = previousInlineTransform;
+  siteNav.style.pointerEvents = previousInlinePointerEvents;
+  siteNav.style.overflow = previousInlineOverflow;
 
   if (!wasOpen) {
     siteNav.classList.remove("open");
@@ -281,11 +299,10 @@ menuToggle?.addEventListener("click", () => {
   if (isOpen && window.innerWidth <= 760) {
     syncMobileMenuMetrics();
     mobileMenuScrollAnchor = window.scrollY;
-    if (mobileMenuProgress <= 0.01) {
-      mobileMenuProgress = 0;
-      applyMobileMenuProgress(0);
-    }
-    setMobileMenuTargetProgress(1);
+    stopMobileMenuAnimation();
+    mobileMenuProgress = 1;
+    mobileMenuTargetProgress = 1;
+    applyMobileMenuProgress(1);
   } else if (!isOpen) {
     setMobileMenuTargetProgress(1);
   }
