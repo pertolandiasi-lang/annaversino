@@ -23,7 +23,10 @@ let mobileMenuGestureOffset = 0;
 let mobileMenuTouchY = null;
 const MOBILE_MENU_ROW_HEIGHT = 58;
 const MOBILE_MENU_ROW_VISIBLE_HEIGHT = 54;
-const MOBILE_MENU_VERTICAL_PADDING = 16;
+const MOBILE_MENU_FIRST_ROW_MARGIN = 4;
+const MOBILE_MENU_ROW_MARGIN = 10;
+const MOBILE_MENU_TOP_PADDING = 34;
+const MOBILE_MENU_BOTTOM_PADDING = 16;
 const MOBILE_MENU_COLLAPSE_DISTANCE = 120;
 
 if ("scrollRestoration" in window.history) {
@@ -86,7 +89,11 @@ function syncMobileMenuMetrics() {
   }));
   const measuredHeight = siteNav.scrollHeight;
   const estimatedHeight =
-    siteNavLinks.length * MOBILE_MENU_ROW_HEIGHT + MOBILE_MENU_VERTICAL_PADDING;
+    MOBILE_MENU_TOP_PADDING +
+    MOBILE_MENU_BOTTOM_PADDING +
+    siteNavLinks.length * MOBILE_MENU_ROW_VISIBLE_HEIGHT +
+    MOBILE_MENU_FIRST_ROW_MARGIN +
+    Math.max(siteNavLinks.length - 1, 0) * MOBILE_MENU_ROW_MARGIN;
   const hasUsableMetrics =
     measuredHeight > MOBILE_MENU_ROW_VISIBLE_HEIGHT * 3 &&
     measuredMetrics.some((metric) => metric.height > 0);
@@ -95,7 +102,7 @@ function syncMobileMenuMetrics() {
     top: hasUsableMetrics && metric.height > 0 ? metric.top : metric.fallbackTop,
     height: hasUsableMetrics && metric.height > 0 ? metric.height : metric.fallbackHeight
   }));
-  mobileMenuOpenHeight = hasUsableMetrics ? measuredHeight : estimatedHeight;
+  mobileMenuOpenHeight = hasUsableMetrics ? Math.max(measuredHeight, estimatedHeight) : estimatedHeight;
 
   siteHeader.style.setProperty("--mobile-menu-open-height", `${mobileMenuOpenHeight}px`);
   siteHeader.style.setProperty("--mobile-menu-current-height", `${mobileMenuOpenHeight}px`);
@@ -187,7 +194,7 @@ function applyMobileMenuProgress(progress) {
 
   const currentHeight = Math.max(
     0,
-    Math.min(mobileMenuOpenHeight, lastVisibleBottom + 8 * progress)
+    Math.min(mobileMenuOpenHeight, lastVisibleBottom + MOBILE_MENU_BOTTOM_PADDING + 8 * progress)
   );
 
   siteHeader.style.setProperty("--mobile-menu-current-height", `${currentHeight}px`);
