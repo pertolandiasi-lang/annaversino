@@ -285,12 +285,26 @@ function setMobileMenuScrollTop(nextScrollTop) {
   }
 
   const clampedScrollTop = Math.max(0, Math.min(nextScrollTop, menuScrollDistance));
+  const overflowDelta = nextScrollTop - clampedScrollTop;
 
   if (clampedScrollTop === siteNav.scrollTop) {
+    if (overflowDelta > 0.5 && isMobileMenuOpen()) {
+      finishClosingMobileMenu();
+      window.requestAnimationFrame(() => {
+        window.scrollBy({ top: overflowDelta, left: 0, behavior: "auto" });
+      });
+    }
     return;
   }
 
   siteNav.scrollTop = clampedScrollTop;
+
+  if (overflowDelta > 0.5 && isMobileMenuOpen()) {
+    finishClosingMobileMenu();
+    window.requestAnimationFrame(() => {
+      window.scrollBy({ top: overflowDelta, left: 0, behavior: "auto" });
+    });
+  }
 }
 
 function handleMobileMenuScroll() {
