@@ -31,7 +31,7 @@ const navLinks = document.querySelectorAll('a[href^="#"]');
 let menuProgress = 0;
 let menuOpenHeight = 0;
 let menuScrollDistance = 160;
-let menuTouchY = null;
+let menuOpenScrollY = 0;
 let menuGestureTimeout = null;
 let menuCloseTimeout = null;
 let isPageScrollLocked = false;
@@ -99,19 +99,13 @@ function setPageScrollLock(shouldLock) {
 
 function updateBodyScrollLock() {
   const modalOpen = !!modal && !modal.classList.contains("hidden");
-  setPageScrollLock(modalOpen || isMobileMenuOpen());
+  setPageScrollLock(modalOpen);
 }
 
-function getMenuOverlayOverlap() {
-  if (window.innerWidth <= 520) {
-    return 18;
-  }
-
-  if (window.innerWidth <= 760) {
-    return 20;
-  }
-
-  return 22;
+function syncCollapsedHeaderOffset() {
+  const nextOffset =
+    siteHeader && siteHeaderBar && isCollapsedNav() ? Math.ceil(siteHeader.offsetHeight + 12) : 0;
+  document.documentElement.style.setProperty("--header-offset", `${nextOffset}px`);
 }
 
 function syncMobileMenuMetrics() {
@@ -119,15 +113,9 @@ function syncMobileMenuMetrics() {
     return 0;
   }
 
-  const headerRect = siteHeaderBar.getBoundingClientRect();
-  const overlap = getMenuOverlayOverlap();
   const measuredHeight =
     siteNavLinksWrapper.scrollHeight + MENU_OPEN_PADDING_TOP + MENU_OPEN_PADDING_BOTTOM;
-  const availableHeight = Math.max(
-    window.innerHeight - Math.round(headerRect.bottom - overlap) - 16,
-    220
-  );
-  const overlayHeight = Math.min(measuredHeight, availableHeight);
+  const overlayHeight = Math.min(measuredHeight, Math.max(window.innerHeight - 140, 220));
   const measuredScrollDistance = Math.round(
     Math.max(
       MENU_SCROLL_DISTANCE_MIN,
@@ -139,9 +127,6 @@ function syncMobileMenuMetrics() {
   menuScrollDistance = measuredScrollDistance;
   siteHeader.style.setProperty("--menu-open-height", `${overlayHeight}px`);
   siteHeader.style.setProperty("--menu-scroll-distance", `${measuredScrollDistance}px`);
-  siteHeader.style.setProperty("--menu-overlay-top", `${Math.round(headerRect.bottom - overlap)}px`);
-  siteHeader.style.setProperty("--menu-overlay-left", `${Math.round(headerRect.left - 1)}px`);
-  siteHeader.style.setProperty("--menu-overlay-width", `${Math.round(headerRect.width + 2)}px`);
 
   return overlayHeight;
 }
@@ -198,11 +183,8 @@ function finishClosingMobileMenu() {
   siteNav?.classList.remove("open");
   siteHeader?.classList.remove("mobile-menu-open");
   menuToggle?.setAttribute("aria-expanded", "false");
-  menuTouchY = null;
+  menuOpenScrollY = window.scrollY;
   menuProgress = 0;
-  if (siteNav) {
-    siteNav.scrollTop = 0;
-  }
   siteHeader?.style.setProperty("--menu-progress", "0");
   siteHeader?.style.setProperty("--menu-current-height", "0px");
   updateBodyScrollLock();
@@ -233,15 +215,13 @@ function openMobileMenu() {
   siteNav.classList.add("open");
   siteHeader.classList.add("mobile-menu-open");
   menuToggle?.setAttribute("aria-expanded", "true");
-  menuTouchY = null;
-  siteNav.scrollTop = 0;
+  menuOpenScrollY = window.scrollY;
   applyMobileMenuProgress(0);
   syncMobileMenuMetrics();
-  updateBodyScrollLock();
+  syncCollapsedHeaderOffset();
 
   requestAnimationFrame(() => {
     syncMobileMenuMetrics();
-    siteNav.scrollTop = 0;
     applyMobileMenuProgress(1);
   });
 }
@@ -279,53 +259,16 @@ function normalizeWheelDelta(event) {
   return event.deltaY * 1.04;
 }
 
-function setMobileMenuScrollTop(nextScrollTop) {
-  if (!siteNav) {
+function syncMenuProgressWithWindowScroll() {
+  if (!isMobileMenuOpen()) {
     return;
   }
 
-  const clampedScrollTop = Math.max(0, Math.min(nextScrollTop, menuScrollDistance));
-  const overflowDelta = nextScrollTop - clampedScrollTop;
-
-  if (clampedScrollTop === siteNav.scrollTop) {
-    if (overflowDelta > 0.5 && isMobileMenuOpen()) {
-      finishClosingMobileMenu();
-      window.requestAnimationFrame(() => {
-        window.scrollBy({ top: overflowDelta, left: 0, behavior: "auto" });
-      });
-    }
-    return;
-  }
-
-  siteNav.scrollTop = clampedScrollTop;
-
-  if (overflowDelta > 0.5 && isMobileMenuOpen()) {
-    finishClosingMobileMenu();
-    window.requestAnimationFrame(() => {
-      window.scrollBy({ top: overflowDelta, left: 0, behavior: "auto" });
-    });
-  }
-}
-
-function handleMobileMenuScroll() {
-  if (!isMobileMenuOpen() || !siteNav) {
-    return;
-  }
+  const collapseDistance = Math.max(window.scrollY - menuOpenScrollY, 0);
+  const nextProgress = 1 - collapseDistance / Math.max(menuScrollDistance, 1);
 
   startMenuGestureState();
-
-  if (menuCloseTimeout !== null) {
-    window.clearTimeout(menuCloseTimeout);
-    menuCloseTimeout = null;
-  }
-
-  const clampedScrollTop = Math.max(0, Math.min(siteNav.scrollTop, menuScrollDistance));
-
-  if (clampedScrollTop !== siteNav.scrollTop) {
-    siteNav.scrollTop = clampedScrollTop;
-  }
-
-  applyMobileMenuProgress(1 - clampedScrollTop / Math.max(menuScrollDistance, 1));
+  applyMobileMenuProgress(nextProgress);
 
   if (menuProgress <= MENU_CLOSE_THRESHOLD) {
     finishClosingMobileMenu();
@@ -531,13 +474,15 @@ function updateMobileHeaderState() {
 
   if (!isCollapsedNav()) {
     closeMobileMenu({ immediate: true });
+    syncCollapsedHeaderOffset();
     return;
   }
 
   syncMobileMenuMetrics();
+  syncCollapsedHeaderOffset();
 
   if (isMobileMenuOpen()) {
-    applyMobileMenuProgress(menuProgress);
+    syncMenuProgressWithWindowScroll();
   }
 
   updateBodyScrollLock();
@@ -596,79 +541,6 @@ updateUniverseBackground();
 updateMobileHeaderState();
 window.addEventListener("scroll", updateUniverseBackground, { passive: true });
 window.addEventListener("scroll", updateMobileHeaderState, { passive: true });
-siteNav?.addEventListener("scroll", handleMobileMenuScroll, { passive: true });
-document.addEventListener(
-  "wheel",
-  (event) => {
-    if (!isMobileMenuOpen() || !siteNav) {
-      return;
-    }
-
-    event.preventDefault();
-    setMobileMenuScrollTop(siteNav.scrollTop + normalizeWheelDelta(event));
-  },
-  { passive: false, capture: true }
-);
-document.addEventListener(
-  "touchstart",
-  (event) => {
-    if (!isMobileMenuOpen()) {
-      menuTouchY = null;
-      return;
-    }
-
-    menuTouchY = event.touches[0]?.clientY ?? null;
-  },
-  { passive: true, capture: true }
-);
-document.addEventListener(
-  "touchmove",
-  (event) => {
-    if (!isMobileMenuOpen() || !siteNav) {
-      menuTouchY = null;
-      return;
-    }
-
-    const currentTouchY = event.touches[0]?.clientY;
-
-    if (typeof currentTouchY !== "number") {
-      return;
-    }
-
-    if (menuTouchY === null) {
-      menuTouchY = currentTouchY;
-      return;
-    }
-
-    const deltaY = menuTouchY - currentTouchY;
-
-    if (Math.abs(deltaY) < 0.5) {
-      return;
-    }
-
-    event.preventDefault();
-    setMobileMenuScrollTop(siteNav.scrollTop + deltaY);
-    menuTouchY = currentTouchY;
-  },
-  { passive: false, capture: true }
-);
-document.addEventListener(
-  "touchend",
-  () => {
-    menuTouchY = null;
-  },
-  { capture: true }
-);
-document.addEventListener(
-  "touchcancel",
-  () => {
-    menuTouchY = null;
-  },
-  { capture: true }
-);
-window.addEventListener("blur", () => {
-  menuTouchY = null;
-});
 window.addEventListener("resize", () => {
   updateUniverseBackground();
   updateMobileHeaderState();

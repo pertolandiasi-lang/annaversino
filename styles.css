@@ -23,6 +23,7 @@
 html {
   scroll-behavior: smooth;
   scrollbar-gutter: stable both-edges;
+  --header-offset: 0px;
 }
 
 html.page-scroll-locked,
@@ -86,6 +87,7 @@ a {
   position: relative;
   z-index: 1;
   width: 100%;
+  padding-top: var(--header-offset);
 }
 
 .site-header {
@@ -97,9 +99,6 @@ a {
   --menu-progress: 0;
   --menu-open-height: 0px;
   --menu-current-height: 0px;
-  --menu-overlay-top: 92px;
-  --menu-overlay-left: 18px;
-  --menu-overlay-width: calc(100vw - 36px);
 }
 
 .site-header-bar {
@@ -821,6 +820,10 @@ h3 {
 
 @media (max-width: 1100px) {
   .site-header {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
     padding: 16px 18px;
     overflow: visible;
   }
@@ -894,9 +897,7 @@ h3 {
   }
 
   .site-nav-sensor {
-    display: block;
-    height: var(--menu-scroll-distance, 320px);
-    pointer-events: none;
+    display: none;
   }
 
   .site-nav.open {
@@ -911,13 +912,13 @@ h3 {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03)),
       var(--panel);
-    box-shadow: var(--panel-shadow);
+    box-shadow:
+      0 28px 54px rgba(6, 3, 20, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
     background-clip: padding-box;
     backdrop-filter: blur(18px) saturate(124%);
     -webkit-backdrop-filter: blur(18px) saturate(124%);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden;
     transform:
       translateY(calc((1 - var(--menu-progress, 0)) * -14px))
       scale(calc(0.96 + (0.04 * var(--menu-progress, 0))));
@@ -1122,9 +1123,7 @@ h3 {
     opacity: calc(0.18 + (0.82 * var(--menu-progress, 0)));
     pointer-events: auto;
     border-radius: 0 0 28px 28px;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden;
     transform:
       translateY(calc((1 - var(--menu-progress, 0)) * -14px))
       scale(calc(0.96 + (0.04 * var(--menu-progress, 0))));
