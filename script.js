@@ -32,7 +32,6 @@ let menuOpenHeight = 0;
 let menuTouchY = null;
 let menuGestureTimeout = null;
 let menuCloseTimeout = null;
-let lockedPageScrollY = 0;
 let isPageScrollLocked = false;
 const MENU_SCROLL_DISTANCE = 320;
 const MENU_CLOSE_THRESHOLD = 0.03;
@@ -77,16 +76,10 @@ function isMobileMenuOpen() {
 
 function setPageScrollLock(shouldLock) {
   if (shouldLock && !isPageScrollLocked) {
-    lockedPageScrollY = window.scrollY;
     document.documentElement.classList.add("page-scroll-locked");
     document.body.classList.add("page-scroll-locked");
     document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${lockedPageScrollY}px`;
-    document.body.style.left = "0";
-    document.body.style.right = "0";
-    document.body.style.width = "100%";
     isPageScrollLocked = true;
     return;
   }
@@ -96,12 +89,6 @@ function setPageScrollLock(shouldLock) {
     document.body.classList.remove("page-scroll-locked");
     document.documentElement.style.overflow = "";
     document.body.style.overflow = "";
-    document.body.style.position = "";
-    document.body.style.top = "";
-    document.body.style.left = "";
-    document.body.style.right = "";
-    document.body.style.width = "";
-    window.scrollTo({ top: lockedPageScrollY, left: 0, behavior: "auto" });
     isPageScrollLocked = false;
   }
 }
