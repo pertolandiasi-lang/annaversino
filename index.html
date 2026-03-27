@@ -19,7 +19,7 @@
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260327-menufix5" />
+    <link rel="stylesheet" href="styles.css?v=20260327-contactform1" />
   </head>
   <body>
     <div class="site-background" aria-hidden="true"></div>
@@ -474,7 +474,13 @@
                   as soon as possible.
                 </p>
 
-                <form class="contact-form contact-form-plain" id="contact-form">
+                <form
+                  class="contact-form contact-form-plain"
+                  id="contact-form"
+                  data-endpoint="https://script.google.com/macros/s/AKfycbyuGSI6SEaZ5d6YdaLbYetLIUrQI_fM3IzNNxeArlOP57sTCoodu4DZipNOP_tLEx3NQw/exec"
+                  data-source="website-contact-form"
+                  novalidate
+                >
                   <div class="form-grid">
                     <label>
                       <span>First name</span>
@@ -512,8 +518,20 @@
                       ></textarea>
                     </label>
                   </div>
-                  <button class="button" type="submit">Submit</button>
-                  <p class="form-note" id="form-note" role="status" aria-live="polite"></p>
+                  <label class="form-honeypot" aria-hidden="true">
+                    <span>Website</span>
+                    <input
+                      id="website"
+                      name="website"
+                      type="text"
+                      tabindex="-1"
+                      autocomplete="off"
+                    />
+                  </label>
+                  <div class="contact-form-actions">
+                    <button class="button" id="contact-submit" type="submit">Submit</button>
+                    <p class="form-note" id="form-note" role="status" aria-live="polite"></p>
+                  </div>
                 </form>
               </div>
 
@@ -554,6 +572,6 @@
       </div>
     </div>
 
-    <script src="script.js?v=20260327-menufix6"></script>
+    <script src="script.js?v=20260327-contactform1"></script>
   </body>
 </html>
