@@ -12,13 +12,6 @@ const formNote = document.getElementById("form-note");
 const siteBackground = document.querySelector(".site-background");
 const siteHeader = document.querySelector(".site-header");
 const navLinks = document.querySelectorAll('a[href^="#"]');
-const siteNavLinks = siteNav?.querySelectorAll("a") ?? [];
-let mobileMenuScrollAnchor = 0;
-let mobileMenuProgress = 1;
-let mobileMenuTargetProgress = 1;
-let mobileMenuAnimationFrame = null;
-let mobileMenuOpenHeight = 0;
-let mobileMenuLinkMetrics = [];
 
 if ("scrollRestoration" in window.history) {
   window.history.scrollRestoration = "manual";
@@ -26,7 +19,11 @@ if ("scrollRestoration" in window.history) {
 
 function forcePageTop() {
   if (window.location.hash) {
-    history.replaceState(null, "", window.location.pathname + window.location.search);
+    try {
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    } catch (error) {
+      // Some local previews can reject replaceState; skipping it keeps the page usable.
+    }
   }
 
   window.scrollTo({ top: 0, left: 0, behavior: "auto" });
@@ -44,154 +41,36 @@ document.addEventListener("DOMContentLoaded", forcePageTop);
 window.addEventListener("load", forcePageTop);
 window.addEventListener("pageshow", forcePageTop);
 
-function syncMobileMenuMetrics() {
-  if (!siteNav || !siteHeader || window.innerWidth > 760) {
+function isCollapsedNav() {
+  return window.innerWidth <= 1100;
+}
+
+function isMobileMenuOpen() {
+  return isCollapsedNav() && !!siteNav?.classList.contains("open");
+}
+
+function updateBodyScrollLock() {
+  const modalOpen = !!modal && !modal.classList.contains("hidden");
+  const shouldLockForMenu = window.innerWidth <= 760 && isMobileMenuOpen();
+  document.body.style.overflow = modalOpen || shouldLockForMenu ? "hidden" : "";
+}
+
+function openMobileMenu() {
+  if (!siteNav) {
     return;
   }
 
-  const wasOpen = siteNav.classList.contains("open");
-
-  if (!wasOpen) {
-    siteNav.classList.add("open");
-  }
-
-  const previousProgress = mobileMenuProgress;
-  siteHeader.style.setProperty("--mobile-menu-progress", "1");
-  siteNavLinks.forEach((link) => {
-    link.style.setProperty("--menu-link-progress", "1");
-  });
-
-  mobileMenuLinkMetrics = Array.from(siteNavLinks, (link) => ({
-    top: link.offsetTop,
-    height: link.offsetHeight
-  }));
-  mobileMenuOpenHeight = siteNav.scrollHeight;
-
-  siteHeader.style.setProperty("--mobile-menu-open-height", `${mobileMenuOpenHeight}px`);
-
-  if (!wasOpen) {
-    siteNav.classList.remove("open");
-  }
-
-  siteHeader.style.setProperty("--mobile-menu-progress", `${previousProgress}`);
+  siteNav.classList.add("open");
+  siteHeader?.classList.add("mobile-menu-open");
+  menuToggle?.setAttribute("aria-expanded", "true");
+  updateBodyScrollLock();
 }
 
-function invalidateMobileMenuMetrics() {
-  mobileMenuOpenHeight = 0;
-  mobileMenuLinkMetrics = [];
-}
-
-function applyMobileMenuProgress(progress) {
-  if (!siteHeader) {
-    return;
-  }
-
-  siteHeader.style.setProperty("--mobile-menu-progress", `${progress}`);
-
-  if (!mobileMenuOpenHeight || mobileMenuLinkMetrics.length !== siteNavLinks.length) {
-    syncMobileMenuMetrics();
-  }
-
-  if (progress >= 0.999) {
-    siteHeader.style.setProperty(
-      "--mobile-menu-current-height",
-      `${mobileMenuOpenHeight || siteNav?.scrollHeight || 0}px`
-    );
-
-    siteNavLinks.forEach((link) => {
-      link.style.setProperty("--menu-link-progress", "1");
-    });
-
-    return;
-  }
-
-  const totalLinks = siteNavLinks.length;
-  const collapse = 1 - progress;
-  const dissolvePhase = collapse;
-  let lastVisibleBottom = 0;
-
-  siteNavLinks.forEach((link, index) => {
-    const fromBottom = totalLinks - 1 - index;
-    const start = fromBottom * 0.06;
-    const end = Math.min(start + 0.46, 1);
-    const rawLinkProgress =
-      1 - Math.max(0, Math.min((dissolvePhase - start) / (end - start || 1), 1));
-    const easedLinkProgress =
-      rawLinkProgress * rawLinkProgress * (rawLinkProgress * (rawLinkProgress * 6 - 15) + 10);
-
-    link.style.setProperty("--menu-link-progress", `${easedLinkProgress}`);
-
-    const metrics = mobileMenuLinkMetrics[index];
-
-    if (!metrics || easedLinkProgress <= 0.001) {
-      return;
-    }
-
-    const visibleBottom = metrics.top + metrics.height * (0.42 + 0.58 * easedLinkProgress);
-    lastVisibleBottom = Math.max(lastVisibleBottom, visibleBottom);
-  });
-
-  const currentHeight = Math.max(
-    0,
-    Math.min(mobileMenuOpenHeight, lastVisibleBottom + 8 * progress)
-  );
-
-  siteHeader.style.setProperty("--mobile-menu-current-height", `${currentHeight}px`);
-}
-
-function stopMobileMenuAnimation() {
-  if (mobileMenuAnimationFrame !== null) {
-    cancelAnimationFrame(mobileMenuAnimationFrame);
-    mobileMenuAnimationFrame = null;
-  }
-}
-
-function animateMobileMenuProgress() {
-  if (mobileMenuAnimationFrame !== null) {
-    return;
-  }
-
-  const tick = () => {
-    const delta = mobileMenuTargetProgress - mobileMenuProgress;
-
-    if (Math.abs(delta) < 0.0015) {
-      mobileMenuProgress = mobileMenuTargetProgress;
-      applyMobileMenuProgress(mobileMenuProgress);
-      mobileMenuAnimationFrame = null;
-
-      if (mobileMenuProgress <= 0.01 && siteNav?.classList.contains("open")) {
-        siteNav.classList.remove("open");
-        siteHeader?.classList.remove("mobile-menu-open");
-        menuToggle?.setAttribute("aria-expanded", "false");
-        mobileMenuProgress = 0;
-        mobileMenuTargetProgress = 0;
-        applyMobileMenuProgress(0);
-      }
-
-      return;
-    }
-
-    // Ease toward the target for a softer liquid-glass feel.
-    mobileMenuProgress += delta * 0.075;
-    applyMobileMenuProgress(mobileMenuProgress);
-    mobileMenuAnimationFrame = requestAnimationFrame(tick);
-  };
-
-  mobileMenuAnimationFrame = requestAnimationFrame(tick);
-}
-
-function setMobileMenuTargetProgress(progress) {
-  mobileMenuTargetProgress = Math.max(0, Math.min(progress, 1));
-
-  if (window.innerWidth > 760) {
-    mobileMenuProgress = 1;
-    mobileMenuTargetProgress = 1;
-    applyMobileMenuProgress(1);
-    stopMobileMenuAnimation();
-    return;
-  }
-
-  animateMobileMenuProgress();
+function closeMobileMenu() {
+  siteNav?.classList.remove("open");
+  siteHeader?.classList.remove("mobile-menu-open");
+  menuToggle?.setAttribute("aria-expanded", "false");
+  updateBodyScrollLock();
 }
 
 const modalContent = {
@@ -253,7 +132,7 @@ const modalContent = {
 function setModalContent(key) {
   const content = modalContent[key];
 
-  if (!content) {
+  if (!content || !modalKicker || !modalTitle || !modalBody) {
     return;
   }
 
@@ -263,37 +142,45 @@ function setModalContent(key) {
 }
 
 function openModal(key) {
+  if (!modal) {
+    return;
+  }
+
   setModalContent(key);
   modal.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
+  updateBodyScrollLock();
 }
 
 function closeModal() {
+  if (!modal) {
+    return;
+  }
+
   modal.classList.add("hidden");
-  document.body.style.overflow = "";
+  updateBodyScrollLock();
 }
 
 menuToggle?.addEventListener("click", () => {
-  const isOpen = siteNav.classList.toggle("open");
-  menuToggle.setAttribute("aria-expanded", String(isOpen));
-  siteHeader?.classList.toggle("mobile-menu-open", isOpen);
-
-  if (isOpen && window.innerWidth <= 760) {
-    syncMobileMenuMetrics();
-    mobileMenuScrollAnchor = window.scrollY;
-    if (mobileMenuProgress <= 0.01) {
-      mobileMenuProgress = 0;
-      applyMobileMenuProgress(0);
-    }
-    setMobileMenuTargetProgress(1);
-  } else if (!isOpen) {
-    setMobileMenuTargetProgress(1);
+  if (!siteNav) {
+    return;
   }
+
+  if (siteNav.classList.contains("open")) {
+    closeMobileMenu();
+    return;
+  }
+
+  openMobileMenu();
 });
 
 faqButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const item = button.closest(".faq-item");
+
+    if (!item) {
+      return;
+    }
+
     const isOpen = item.classList.toggle("open");
     button.setAttribute("aria-expanded", String(isOpen));
   });
@@ -310,8 +197,17 @@ closeModalButtons.forEach((button) => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !modal.classList.contains("hidden")) {
+  if (event.key !== "Escape") {
+    return;
+  }
+
+  if (modal && !modal.classList.contains("hidden")) {
     closeModal();
+    return;
+  }
+
+  if (isMobileMenuOpen()) {
+    closeMobileMenu();
   }
 });
 
@@ -370,39 +266,16 @@ function updateMobileHeaderState() {
   }
 
   const isMobile = window.innerWidth <= 760;
-  const collapseDistance = 120;
-  const isScrolled = window.scrollY > collapseDistance;
+  const isScrolled = window.scrollY > 120;
 
   siteHeader.classList.toggle("mobile-scrolled", isMobile && isScrolled);
 
-  if (!isMobile) {
-    siteHeader.classList.remove("mobile-menu-open");
-    siteNav?.classList.remove("open");
-    menuToggle?.setAttribute("aria-expanded", "false");
-    stopMobileMenuAnimation();
-    mobileMenuProgress = 1;
-    mobileMenuTargetProgress = 1;
-    applyMobileMenuProgress(1);
-    mobileMenuScrollAnchor = 0;
+  if (!isCollapsedNav()) {
+    closeMobileMenu();
     return;
   }
 
-  if (isMobile && siteNav?.classList.contains("open")) {
-    if (!mobileMenuOpenHeight || mobileMenuLinkMetrics.length !== siteNavLinks.length) {
-      syncMobileMenuMetrics();
-    }
-    const menuDelta = Math.max(window.scrollY - mobileMenuScrollAnchor, 0);
-    const rawProgress = Math.max(0, 1 - Math.min(menuDelta / collapseDistance, 1));
-    const menuProgress = rawProgress * rawProgress * (3 - 2 * rawProgress);
-    setMobileMenuTargetProgress(menuProgress);
-  } else if (mobileMenuProgress <= 0.01) {
-    stopMobileMenuAnimation();
-    mobileMenuTargetProgress = 0;
-    mobileMenuProgress = 0;
-    applyMobileMenuProgress(0);
-  } else {
-    setMobileMenuTargetProgress(1);
-  }
+  updateBodyScrollLock();
 }
 
 function getHeaderOffset() {
@@ -446,10 +319,9 @@ navLinks.forEach((link) => {
 
     event.preventDefault();
 
-    siteNav?.classList.remove("open");
-    siteHeader?.classList.remove("mobile-menu-open");
-    menuToggle?.setAttribute("aria-expanded", "false");
-    setMobileMenuTargetProgress(1);
+    if (isCollapsedNav()) {
+      closeMobileMenu();
+    }
 
     scrollToSection(targetId);
   });
@@ -460,7 +332,6 @@ updateMobileHeaderState();
 window.addEventListener("scroll", updateUniverseBackground, { passive: true });
 window.addEventListener("scroll", updateMobileHeaderState, { passive: true });
 window.addEventListener("resize", () => {
-  invalidateMobileMenuMetrics();
   updateUniverseBackground();
   updateMobileHeaderState();
 });
