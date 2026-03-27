@@ -404,6 +404,28 @@ menuToggle?.addEventListener("click", () => {
   openMobileMenu();
 });
 
+document.addEventListener(
+  "click",
+  (event) => {
+    if (!isMobileMenuOpen() || !siteNav || !siteHeaderBar) {
+      return;
+    }
+
+    const target = event.target;
+
+    if (!(target instanceof Node)) {
+      return;
+    }
+
+    if (siteNav.contains(target) || siteHeaderBar.contains(target)) {
+      return;
+    }
+
+    closeMobileMenu();
+  },
+  { capture: true }
+);
+
 faqButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const item = button.closest(".faq-item");
