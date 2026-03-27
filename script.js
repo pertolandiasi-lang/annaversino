@@ -29,12 +29,15 @@ const siteNavLinksWrapper = siteNav?.querySelector(".site-nav-links");
 const navLinks = document.querySelectorAll('a[href^="#"]');
 let menuProgress = 0;
 let menuOpenHeight = 0;
+let menuScrollDistance = 176;
 let menuTouchY = null;
 let menuGestureTimeout = null;
 let menuCloseTimeout = null;
 let isPageScrollLocked = false;
-const MENU_SCROLL_DISTANCE = 320;
-const MENU_CLOSE_THRESHOLD = 0.03;
+const MENU_SCROLL_DISTANCE_MIN = 152;
+const MENU_SCROLL_DISTANCE_MAX = 196;
+const MENU_SCROLL_DISTANCE_RATIO = 0.38;
+const MENU_CLOSE_THRESHOLD = 0.08;
 const MENU_OPEN_PADDING_TOP = 22;
 const MENU_OPEN_PADDING_BOTTOM = 6;
 
@@ -105,9 +108,17 @@ function syncMobileMenuMetrics() {
 
   const measuredHeight =
     siteNavLinksWrapper.scrollHeight + MENU_OPEN_PADDING_TOP + MENU_OPEN_PADDING_BOTTOM;
+  const measuredScrollDistance = Math.round(
+    Math.max(
+      MENU_SCROLL_DISTANCE_MIN,
+      Math.min(MENU_SCROLL_DISTANCE_MAX, measuredHeight * MENU_SCROLL_DISTANCE_RATIO)
+    )
+  );
+
   menuOpenHeight = measuredHeight;
+  menuScrollDistance = measuredScrollDistance;
   siteHeader.style.setProperty("--menu-open-height", `${measuredHeight}px`);
-  siteHeader.style.setProperty("--menu-scroll-distance", `${MENU_SCROLL_DISTANCE}px`);
+  siteHeader.style.setProperty("--menu-scroll-distance", `${measuredScrollDistance}px`);
 
   return measuredHeight;
 }
@@ -231,14 +242,18 @@ function closeMobileMenu(options = {}) {
 
 function normalizeWheelDelta(event) {
   if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
-    return event.deltaY * 18;
+    return event.deltaY * 26;
   }
 
   if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
     return event.deltaY * window.innerHeight;
   }
 
-  return event.deltaY;
+  if (Math.abs(event.deltaY) >= 48) {
+    return event.deltaY * 1.12;
+  }
+
+  return event.deltaY * 1.04;
 }
 
 function setMobileMenuScrollTop(nextScrollTop) {
@@ -246,7 +261,7 @@ function setMobileMenuScrollTop(nextScrollTop) {
     return;
   }
 
-  const clampedScrollTop = Math.max(0, Math.min(nextScrollTop, MENU_SCROLL_DISTANCE));
+  const clampedScrollTop = Math.max(0, Math.min(nextScrollTop, menuScrollDistance));
 
   if (clampedScrollTop === siteNav.scrollTop) {
     return;
@@ -267,13 +282,13 @@ function handleMobileMenuScroll() {
     menuCloseTimeout = null;
   }
 
-  const clampedScrollTop = Math.max(0, Math.min(siteNav.scrollTop, MENU_SCROLL_DISTANCE));
+  const clampedScrollTop = Math.max(0, Math.min(siteNav.scrollTop, menuScrollDistance));
 
   if (clampedScrollTop !== siteNav.scrollTop) {
     siteNav.scrollTop = clampedScrollTop;
   }
 
-  applyMobileMenuProgress(1 - clampedScrollTop / MENU_SCROLL_DISTANCE);
+  applyMobileMenuProgress(1 - clampedScrollTop / Math.max(menuScrollDistance, 1));
 
   if (menuProgress <= MENU_CLOSE_THRESHOLD) {
     finishClosingMobileMenu();
