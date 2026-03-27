@@ -31,7 +31,7 @@ const navLinks = document.querySelectorAll('a[href^="#"]');
 let menuProgress = 0;
 let menuOpenHeight = 0;
 let menuScrollDistance = 160;
-let menuOpenScrollY = 0;
+let menuTouchY = null;
 let menuGestureTimeout = null;
 let menuCloseTimeout = null;
 let isPageScrollLocked = false;
@@ -183,7 +183,7 @@ function finishClosingMobileMenu() {
   siteNav?.classList.remove("open");
   siteHeader?.classList.remove("mobile-menu-open");
   menuToggle?.setAttribute("aria-expanded", "false");
-  menuOpenScrollY = window.scrollY;
+  menuTouchY = null;
   menuProgress = 0;
   siteHeader?.style.setProperty("--menu-progress", "0");
   siteHeader?.style.setProperty("--menu-current-height", "0px");
@@ -215,7 +215,7 @@ function openMobileMenu() {
   siteNav.classList.add("open");
   siteHeader.classList.add("mobile-menu-open");
   menuToggle?.setAttribute("aria-expanded", "true");
-  menuOpenScrollY = window.scrollY;
+  menuTouchY = null;
   applyMobileMenuProgress(0);
   syncMobileMenuMetrics();
   syncCollapsedHeaderOffset();
@@ -259,15 +259,44 @@ function normalizeWheelDelta(event) {
   return event.deltaY * 1.04;
 }
 
-function syncMenuProgressWithWindowScroll() {
+function applyMenuGestureDelta(deltaY) {
   if (!isMobileMenuOpen()) {
     return;
   }
 
-  const collapseDistance = Math.max(window.scrollY - menuOpenScrollY, 0);
-  const nextProgress = 1 - collapseDistance / Math.max(menuScrollDistance, 1);
+  const signedDelta = Number(deltaY) || 0;
+  const direction = Math.sign(signedDelta) || 1;
+  const magnitude = Math.abs(signedDelta);
+
+  if (magnitude < 0.5) {
+    return;
+  }
 
   startMenuGestureState();
+  if (menuCloseTimeout !== null) {
+    window.clearTimeout(menuCloseTimeout);
+    menuCloseTimeout = null;
+  }
+
+  const pixelsRemainingToClose = Math.max(
+    (menuProgress - MENU_CLOSE_THRESHOLD) * Math.max(menuScrollDistance, 1),
+    0
+  );
+
+  if (magnitude >= pixelsRemainingToClose) {
+    const overflowDelta = magnitude - pixelsRemainingToClose;
+    finishClosingMobileMenu();
+
+    if (overflowDelta > 0.5) {
+      window.requestAnimationFrame(() => {
+        window.scrollBy({ top: direction * overflowDelta, left: 0, behavior: "auto" });
+      });
+    }
+
+    return;
+  }
+
+  const nextProgress = menuProgress - magnitude / Math.max(menuScrollDistance, 1);
   applyMobileMenuProgress(nextProgress);
 
   if (menuProgress <= MENU_CLOSE_THRESHOLD) {
@@ -480,11 +509,6 @@ function updateMobileHeaderState() {
 
   syncMobileMenuMetrics();
   syncCollapsedHeaderOffset();
-
-  if (isMobileMenuOpen()) {
-    syncMenuProgressWithWindowScroll();
-  }
-
   updateBodyScrollLock();
 }
 
@@ -541,6 +565,84 @@ updateUniverseBackground();
 updateMobileHeaderState();
 window.addEventListener("scroll", updateUniverseBackground, { passive: true });
 window.addEventListener("scroll", updateMobileHeaderState, { passive: true });
+document.addEventListener(
+  "wheel",
+  (event) => {
+    if (!isMobileMenuOpen()) {
+      return;
+    }
+
+    const deltaY = normalizeWheelDelta(event);
+
+    if (Math.abs(deltaY) < 0.5) {
+      return;
+    }
+
+    event.preventDefault();
+    applyMenuGestureDelta(deltaY);
+  },
+  { passive: false, capture: true }
+);
+document.addEventListener(
+  "touchstart",
+  (event) => {
+    if (!isMobileMenuOpen()) {
+      menuTouchY = null;
+      return;
+    }
+
+    menuTouchY = event.touches[0]?.clientY ?? null;
+  },
+  { passive: true, capture: true }
+);
+document.addEventListener(
+  "touchmove",
+  (event) => {
+    if (!isMobileMenuOpen()) {
+      menuTouchY = null;
+      return;
+    }
+
+    const currentTouchY = event.touches[0]?.clientY;
+
+    if (typeof currentTouchY !== "number") {
+      return;
+    }
+
+    if (menuTouchY === null) {
+      menuTouchY = currentTouchY;
+      return;
+    }
+
+    const deltaY = menuTouchY - currentTouchY;
+
+    if (Math.abs(deltaY) < 0.5) {
+      return;
+    }
+
+    event.preventDefault();
+    applyMenuGestureDelta(deltaY);
+    menuTouchY = currentTouchY;
+  },
+  { passive: false, capture: true }
+);
+document.addEventListener(
+  "touchend",
+  () => {
+    menuTouchY = null;
+  },
+  { capture: true }
+);
+document.addEventListener(
+  "touchcancel",
+  () => {
+    menuTouchY = null;
+  },
+  { capture: true }
+);
+window.addEventListener("blur", () => {
+  menuTouchY = null;
+});
 window.addEventListener("resize", () => {
   updateUniverseBackground();
   updateMobileHeaderState();
