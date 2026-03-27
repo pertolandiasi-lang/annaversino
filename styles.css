@@ -91,12 +91,15 @@ a {
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 30;
+  z-index: 35;
   width: 100%;
   padding: 18px 24px 0;
   --menu-progress: 0;
   --menu-open-height: 0px;
   --menu-current-height: 0px;
+  --menu-overlay-top: 92px;
+  --menu-overlay-left: 18px;
+  --menu-overlay-width: calc(100vw - 36px);
 }
 
 .site-header-bar {
@@ -829,6 +832,7 @@ h3 {
     position: relative;
     overflow: visible;
     isolation: isolate;
+    z-index: 35;
   }
 
   .site-header-bar > * {
@@ -844,13 +848,12 @@ h3 {
 
   .site-nav {
     display: block;
-    flex-basis: 100%;
-    width: 100%;
-    position: absolute;
-    top: calc(100% - 22px);
-    right: -1px;
-    left: -1px;
-    z-index: 1;
+    width: var(--menu-overlay-width);
+    position: fixed;
+    top: var(--menu-overlay-top);
+    left: var(--menu-overlay-left);
+    right: auto;
+    z-index: 34;
     padding: 0;
     max-height: 0;
     opacity: 0;
@@ -858,7 +861,7 @@ h3 {
     pointer-events: none;
     transform: translateY(-14px) scale(0.96);
     transform-origin: center top;
-    will-change: max-height, opacity, transform;
+    will-change: max-height, opacity, transform, top, left, width;
     scrollbar-width: none;
     touch-action: pan-y;
     transition:
@@ -904,6 +907,7 @@ h3 {
       linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03)),
       var(--panel);
     box-shadow: var(--panel-shadow);
+    background-clip: padding-box;
     backdrop-filter: blur(18px) saturate(124%);
     -webkit-backdrop-filter: blur(18px) saturate(124%);
     overflow-y: auto;
@@ -1091,8 +1095,6 @@ h3 {
   .site-nav {
     font-size: 1rem;
     margin-top: 0;
-    z-index: 2;
-    top: calc(100% - 20px);
   }
 
   .site-nav::before {
@@ -1327,10 +1329,6 @@ h3 {
   .mobile-nav-preview {
     gap: 14px;
     font-size: 0.9rem;
-  }
-
-  .site-nav {
-    top: calc(100% - 18px);
   }
 
   .site-nav.open {

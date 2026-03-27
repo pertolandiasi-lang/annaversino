@@ -11,6 +11,7 @@ const contactForm = document.getElementById("contact-form");
 const formNote = document.getElementById("form-note");
 const siteBackground = document.querySelector(".site-background");
 const siteHeader = document.querySelector(".site-header");
+const siteHeaderBar = siteHeader?.querySelector(".site-header-bar");
 if (siteNav && !siteNav.querySelector(".site-nav-links")) {
   const navLinksWrapper = document.createElement("div");
   navLinksWrapper.className = "site-nav-links";
@@ -29,15 +30,15 @@ const siteNavLinksWrapper = siteNav?.querySelector(".site-nav-links");
 const navLinks = document.querySelectorAll('a[href^="#"]');
 let menuProgress = 0;
 let menuOpenHeight = 0;
-let menuScrollDistance = 176;
+let menuScrollDistance = 160;
 let menuTouchY = null;
 let menuGestureTimeout = null;
 let menuCloseTimeout = null;
 let isPageScrollLocked = false;
-const MENU_SCROLL_DISTANCE_MIN = 152;
-const MENU_SCROLL_DISTANCE_MAX = 196;
-const MENU_SCROLL_DISTANCE_RATIO = 0.38;
-const MENU_CLOSE_THRESHOLD = 0.08;
+const MENU_SCROLL_DISTANCE_MIN = 132;
+const MENU_SCROLL_DISTANCE_MAX = 176;
+const MENU_SCROLL_DISTANCE_RATIO = 0.34;
+const MENU_CLOSE_THRESHOLD = 0.11;
 const MENU_OPEN_PADDING_TOP = 22;
 const MENU_OPEN_PADDING_BOTTOM = 6;
 
@@ -101,26 +102,48 @@ function updateBodyScrollLock() {
   setPageScrollLock(modalOpen || isMobileMenuOpen());
 }
 
+function getMenuOverlayOverlap() {
+  if (window.innerWidth <= 520) {
+    return 18;
+  }
+
+  if (window.innerWidth <= 760) {
+    return 20;
+  }
+
+  return 22;
+}
+
 function syncMobileMenuMetrics() {
-  if (!siteNav || !siteHeader || !siteNavLinksWrapper || !isCollapsedNav()) {
+  if (!siteNav || !siteHeader || !siteHeaderBar || !siteNavLinksWrapper || !isCollapsedNav()) {
     return 0;
   }
 
+  const headerRect = siteHeaderBar.getBoundingClientRect();
+  const overlap = getMenuOverlayOverlap();
   const measuredHeight =
     siteNavLinksWrapper.scrollHeight + MENU_OPEN_PADDING_TOP + MENU_OPEN_PADDING_BOTTOM;
+  const availableHeight = Math.max(
+    window.innerHeight - Math.round(headerRect.bottom - overlap) - 16,
+    220
+  );
+  const overlayHeight = Math.min(measuredHeight, availableHeight);
   const measuredScrollDistance = Math.round(
     Math.max(
       MENU_SCROLL_DISTANCE_MIN,
-      Math.min(MENU_SCROLL_DISTANCE_MAX, measuredHeight * MENU_SCROLL_DISTANCE_RATIO)
+      Math.min(MENU_SCROLL_DISTANCE_MAX, overlayHeight * MENU_SCROLL_DISTANCE_RATIO)
     )
   );
 
-  menuOpenHeight = measuredHeight;
+  menuOpenHeight = overlayHeight;
   menuScrollDistance = measuredScrollDistance;
-  siteHeader.style.setProperty("--menu-open-height", `${measuredHeight}px`);
+  siteHeader.style.setProperty("--menu-open-height", `${overlayHeight}px`);
   siteHeader.style.setProperty("--menu-scroll-distance", `${measuredScrollDistance}px`);
+  siteHeader.style.setProperty("--menu-overlay-top", `${Math.round(headerRect.bottom - overlap)}px`);
+  siteHeader.style.setProperty("--menu-overlay-left", `${Math.round(headerRect.left - 1)}px`);
+  siteHeader.style.setProperty("--menu-overlay-width", `${Math.round(headerRect.width + 2)}px`);
 
-  return measuredHeight;
+  return overlayHeight;
 }
 
 function applyMobileMenuProgress(progress) {
@@ -214,13 +237,13 @@ function openMobileMenu() {
   siteNav.scrollTop = 0;
   applyMobileMenuProgress(0);
   syncMobileMenuMetrics();
+  updateBodyScrollLock();
 
   requestAnimationFrame(() => {
+    syncMobileMenuMetrics();
     siteNav.scrollTop = 0;
     applyMobileMenuProgress(1);
   });
-
-  updateBodyScrollLock();
 }
 
 function closeMobileMenu(options = {}) {
@@ -242,7 +265,7 @@ function closeMobileMenu(options = {}) {
 
 function normalizeWheelDelta(event) {
   if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
-    return event.deltaY * 26;
+    return event.deltaY * 28;
   }
 
   if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
@@ -497,8 +520,9 @@ function updateMobileHeaderState() {
     return;
   }
 
+  syncMobileMenuMetrics();
+
   if (isMobileMenuOpen()) {
-    syncMobileMenuMetrics();
     applyMobileMenuProgress(menuProgress);
   }
 
