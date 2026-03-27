@@ -24,6 +24,11 @@ html {
   scroll-behavior: smooth;
 }
 
+html.page-scroll-locked,
+body.page-scroll-locked {
+  overscroll-behavior: none;
+}
+
 body {
   margin: 0;
   color: var(--text);

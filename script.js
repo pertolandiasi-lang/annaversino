@@ -32,6 +32,8 @@ let menuOpenHeight = 0;
 let menuTouchY = null;
 let menuGestureTimeout = null;
 let menuCloseTimeout = null;
+let lockedPageScrollY = 0;
+let isPageScrollLocked = false;
 const MENU_SCROLL_DISTANCE = 320;
 const MENU_CLOSE_THRESHOLD = 0.03;
 const MENU_OPEN_PADDING_TOP = 22;
@@ -73,9 +75,40 @@ function isMobileMenuOpen() {
   return isCollapsedNav() && !!siteNav?.classList.contains("open");
 }
 
+function setPageScrollLock(shouldLock) {
+  if (shouldLock && !isPageScrollLocked) {
+    lockedPageScrollY = window.scrollY;
+    document.documentElement.classList.add("page-scroll-locked");
+    document.body.classList.add("page-scroll-locked");
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${lockedPageScrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+    isPageScrollLocked = true;
+    return;
+  }
+
+  if (!shouldLock && isPageScrollLocked) {
+    document.documentElement.classList.remove("page-scroll-locked");
+    document.body.classList.remove("page-scroll-locked");
+    document.documentElement.style.overflow = "";
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.left = "";
+    document.body.style.right = "";
+    document.body.style.width = "";
+    window.scrollTo({ top: lockedPageScrollY, left: 0, behavior: "auto" });
+    isPageScrollLocked = false;
+  }
+}
+
 function updateBodyScrollLock() {
   const modalOpen = !!modal && !modal.classList.contains("hidden");
-  document.body.style.overflow = modalOpen || isMobileMenuOpen() ? "hidden" : "";
+  setPageScrollLock(modalOpen || isMobileMenuOpen());
 }
 
 function syncMobileMenuMetrics() {
@@ -524,7 +557,7 @@ updateMobileHeaderState();
 window.addEventListener("scroll", updateUniverseBackground, { passive: true });
 window.addEventListener("scroll", updateMobileHeaderState, { passive: true });
 siteNav?.addEventListener("scroll", handleMobileMenuScroll, { passive: true });
-window.addEventListener(
+document.addEventListener(
   "wheel",
   (event) => {
     if (!isMobileMenuOpen() || !siteNav) {
@@ -534,9 +567,9 @@ window.addEventListener(
     event.preventDefault();
     setMobileMenuScrollTop(siteNav.scrollTop + normalizeWheelDelta(event));
   },
-  { passive: false }
+  { passive: false, capture: true }
 );
-window.addEventListener(
+document.addEventListener(
   "touchstart",
   (event) => {
     if (!isMobileMenuOpen()) {
@@ -546,9 +579,9 @@ window.addEventListener(
 
     menuTouchY = event.touches[0]?.clientY ?? null;
   },
-  { passive: true }
+  { passive: true, capture: true }
 );
-window.addEventListener(
+document.addEventListener(
   "touchmove",
   (event) => {
     if (!isMobileMenuOpen() || !siteNav) {
@@ -577,12 +610,23 @@ window.addEventListener(
     setMobileMenuScrollTop(siteNav.scrollTop + deltaY);
     menuTouchY = currentTouchY;
   },
-  { passive: false }
+  { passive: false, capture: true }
 );
-window.addEventListener("touchend", () => {
-  menuTouchY = null;
-});
-window.addEventListener("touchcancel", () => {
+document.addEventListener(
+  "touchend",
+  () => {
+    menuTouchY = null;
+  },
+  { capture: true }
+);
+document.addEventListener(
+  "touchcancel",
+  () => {
+    menuTouchY = null;
+  },
+  { capture: true }
+);
+window.addEventListener("blur", () => {
   menuTouchY = null;
 });
 window.addEventListener("resize", () => {
