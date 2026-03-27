@@ -9,9 +9,12 @@ const modalButtons = document.querySelectorAll("[data-modal]");
 const closeModalButtons = document.querySelectorAll("[data-close-modal]");
 const contactForm = document.getElementById("contact-form");
 const formNote = document.getElementById("form-note");
+const contactSubmitButton = document.getElementById("contact-submit");
 const siteBackground = document.querySelector(".site-background");
 const siteHeader = document.querySelector(".site-header");
 const siteHeaderBar = siteHeader?.querySelector(".site-header-bar");
+const CONTACT_FORM_SOURCE_FALLBACK = "website-contact-form";
+const CONTACT_FORM_ENDPOINT_PLACEHOLDER = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
 if (siteNav && !siteNav.querySelector(".site-nav-links")) {
   const navLinksWrapper = document.createElement("div");
   navLinksWrapper.className = "site-nav-links";
@@ -464,36 +467,131 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-contactForm?.addEventListener("submit", (event) => {
+function setContactFormNote(message = "", state = "") {
+  if (!formNote) {
+    return;
+  }
+
+  formNote.textContent = message;
+  formNote.classList.remove("is-error", "is-success", "is-loading");
+
+  if (state) {
+    formNote.classList.add(`is-${state}`);
+  }
+}
+
+function setContactFormSubmitting(isSubmitting) {
+  if (!contactForm || !contactSubmitButton) {
+    return;
+  }
+
+  contactForm.classList.toggle("is-submitting", isSubmitting);
+  contactForm.setAttribute("aria-busy", String(isSubmitting));
+  contactSubmitButton.disabled = isSubmitting;
+  contactSubmitButton.textContent = isSubmitting ? "Sending..." : "Submit";
+}
+
+function getContactFormEndpoint() {
+  const endpoint = contactForm?.dataset.endpoint?.trim() || "";
+
+  if (!endpoint || endpoint === CONTACT_FORM_ENDPOINT_PLACEHOLDER) {
+    return "";
+  }
+
+  return endpoint;
+}
+
+async function submitContactLead(endpoint, payload) {
+  const response = await fetch(endpoint, {
+    method: "POST",
+    mode: "cors",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const responseText = await response.text();
+  let responseData = null;
+
+  if (responseText) {
+    try {
+      responseData = JSON.parse(responseText);
+    } catch (error) {
+      responseData = null;
+    }
+  }
+
+  if (!response.ok || responseData?.ok === false) {
+    throw new Error(responseData?.message || "Unable to save your message right now.");
+  }
+
+  return responseData;
+}
+
+contactForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
 
+  if (!contactForm.checkValidity()) {
+    contactForm.reportValidity();
+    setContactFormNote("Please complete all required fields.", "error");
+    return;
+  }
+
+  const endpoint = getContactFormEndpoint();
   const firstName = document.getElementById("first-name").value.trim();
   const lastName = document.getElementById("last-name").value.trim();
   const email = document.getElementById("email").value.trim();
   const topic = document.getElementById("help-topic").value.trim();
   const message = document.getElementById("message").value.trim();
+  const website = document.getElementById("website").value.trim();
 
   if (!firstName || !lastName || !email || !topic || !message) {
-    formNote.textContent = "Please complete all required fields.";
+    setContactFormNote("Please complete all required fields.", "error");
     return;
   }
 
-  const subject = encodeURIComponent(`Contact Us: ${topic}`);
-  const body = encodeURIComponent(
-    [
-      `First name: ${firstName}`,
-      `Last name: ${lastName}`,
-      `Email: ${email}`,
-      `How can we help you?: ${topic}`,
-      "",
-      "Message:",
-      message
-    ].join("\n")
-  );
+  if (!endpoint) {
+    setContactFormNote(
+      "Connect the contact form to your Google Apps Script web app URL to receive submissions.",
+      "error"
+    );
+    return;
+  }
 
-  window.location.href = `mailto:vulvaverse@gmail.com?subject=${subject}&body=${body}`;
-  contactForm.reset();
-  formNote.textContent = "Thanks, we received your submission.";
+  if (website) {
+    contactForm.reset();
+    setContactFormNote("Thanks, we received your submission.", "success");
+    return;
+  }
+
+  const payload = {
+    first_name: firstName,
+    last_name: lastName,
+    email,
+    topic,
+    message,
+    page_url: window.location.href,
+    source: contactForm.dataset.source?.trim() || CONTACT_FORM_SOURCE_FALLBACK,
+    website
+  };
+
+  try {
+    setContactFormSubmitting(true);
+    setContactFormNote("Sending your message...", "loading");
+    await submitContactLead(endpoint, payload);
+    contactForm.reset();
+    setContactFormNote("Thanks, we received your submission.", "success");
+  } catch (error) {
+    console.error("Contact form submission error:", error);
+    setContactFormNote(
+      "We couldn't send your message right now. Please try again in a moment.",
+      "error"
+    );
+  } finally {
+    setContactFormSubmitting(false);
+  }
 });
 
 function updateUniverseBackground() {

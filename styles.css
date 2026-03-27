@@ -670,6 +670,7 @@ h3 {
 
 .contact-form-plain {
   margin-top: 24px;
+  position: relative;
 }
 
 .form-grid {
@@ -711,6 +712,57 @@ h3 {
 
 .form-grid textarea {
   resize: vertical;
+}
+
+.form-honeypot {
+  display: none !important;
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.contact-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  margin-top: 22px;
+}
+
+.contact-form-actions .button {
+  flex: 0 0 auto;
+}
+
+.contact-form-actions .form-note {
+  flex: 1 1 280px;
+}
+
+.form-note {
+  min-height: 1.68em;
+  margin: 0;
+}
+
+.form-note.is-loading {
+  color: rgba(255, 244, 255, 0.78);
+}
+
+.form-note.is-success {
+  color: rgba(255, 244, 255, 0.94);
+}
+
+.form-note.is-error {
+  color: #ffd7df;
+}
+
+.contact-form-plain.is-submitting .button,
+.contact-form-plain .button[disabled] {
+  opacity: 0.72;
+  transform: none;
+  pointer-events: none;
 }
 
 .contact-side {
@@ -1299,6 +1351,11 @@ h3 {
     margin-top: 18px;
   }
 
+  .contact-form-actions {
+    margin-top: 18px;
+    align-items: flex-start;
+  }
+
   .form-grid {
     gap: 14px;
   }
@@ -1311,6 +1368,11 @@ h3 {
 
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .contact-form-actions {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   h1 {

@@ -37,3 +37,4 @@ This project is static, so it can be uploaded directly to:
 
 - The current live site only uses files inside `assets/vulvaverse/`
 - Archived files are intentionally separated so the repository stays clean without losing earlier material
+- Google Sheets contact intake setup files live in `integrations/google-apps-script/`
