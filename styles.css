@@ -918,13 +918,24 @@ h3 {
     gap: 0;
     width: 100%;
     font-size: 1rem;
-    position: sticky;
-    top: 0;
+    position: relative;
+    top: auto;
     z-index: 1;
   }
 
   .site-nav-sensor {
     display: none;
+  }
+
+  .site-nav a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 48px;
+    padding: 10px 16px;
+    text-align: center;
+    margin-top: 0;
   }
 
   .site-nav.open {
@@ -945,13 +956,6 @@ h3 {
   }
 
   .site-nav.open a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    min-height: 48px;
-    padding: 10px 16px;
-    text-align: center;
     opacity: calc(0.22 + (0.74 * var(--menu-progress, 0)));
     transform:
       translateY(calc((1 - var(--menu-progress, 0)) * -12px))
@@ -1153,14 +1157,6 @@ h3 {
   }
 
   .site-nav.open a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    text-align: center;
-    min-height: 48px;
-    padding: 10px 16px;
-    margin-top: 0;
     opacity: calc(0.22 + (0.74 * var(--menu-progress, 0)));
     transform:
       translateY(calc((1 - var(--menu-progress, 0)) * -12px))
