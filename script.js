@@ -51,8 +51,7 @@ function isMobileMenuOpen() {
 
 function updateBodyScrollLock() {
   const modalOpen = !!modal && !modal.classList.contains("hidden");
-  const shouldLockForMenu = window.innerWidth <= 760 && isMobileMenuOpen();
-  document.body.style.overflow = modalOpen || shouldLockForMenu ? "hidden" : "";
+  document.body.style.overflow = modalOpen ? "hidden" : "";
 }
 
 function openMobileMenu() {
