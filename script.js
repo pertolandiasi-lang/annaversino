@@ -11,14 +11,30 @@ const contactForm = document.getElementById("contact-form");
 const formNote = document.getElementById("form-note");
 const siteBackground = document.querySelector(".site-background");
 const siteHeader = document.querySelector(".site-header");
+if (siteNav && !siteNav.querySelector(".site-nav-links")) {
+  const navLinksWrapper = document.createElement("div");
+  navLinksWrapper.className = "site-nav-links";
+
+  Array.from(siteNav.querySelectorAll("a")).forEach((link) => {
+    navLinksWrapper.append(link);
+  });
+
+  const navSensor = document.createElement("div");
+  navSensor.className = "site-nav-sensor";
+  navSensor.setAttribute("aria-hidden", "true");
+  siteNav.append(navLinksWrapper, navSensor);
+}
+
+const siteNavLinksWrapper = siteNav?.querySelector(".site-nav-links");
 const navLinks = document.querySelectorAll('a[href^="#"]');
 let menuProgress = 0;
 let menuOpenHeight = 0;
-let menuTouchY = null;
 let menuGestureTimeout = null;
 let menuCloseTimeout = null;
 const MENU_SCROLL_DISTANCE = 320;
 const MENU_CLOSE_THRESHOLD = 0.03;
+const MENU_OPEN_PADDING_TOP = 22;
+const MENU_OPEN_PADDING_BOTTOM = 6;
 
 if ("scrollRestoration" in window.history) {
   window.history.scrollRestoration = "manual";
@@ -62,22 +78,15 @@ function updateBodyScrollLock() {
 }
 
 function syncMobileMenuMetrics() {
-  if (!siteNav || !siteHeader || !isCollapsedNav()) {
+  if (!siteNav || !siteHeader || !siteNavLinksWrapper || !isCollapsedNav()) {
     return 0;
   }
 
-  const previousProgress = siteHeader.style.getPropertyValue("--menu-progress");
-  siteHeader.style.setProperty("--menu-progress", "1");
-
-  const measuredHeight = siteNav.scrollHeight;
+  const measuredHeight =
+    siteNavLinksWrapper.scrollHeight + MENU_OPEN_PADDING_TOP + MENU_OPEN_PADDING_BOTTOM;
   menuOpenHeight = measuredHeight;
   siteHeader.style.setProperty("--menu-open-height", `${measuredHeight}px`);
-
-  if (previousProgress) {
-    siteHeader.style.setProperty("--menu-progress", previousProgress);
-  } else {
-    siteHeader.style.removeProperty("--menu-progress");
-  }
+  siteHeader.style.setProperty("--menu-scroll-distance", `${MENU_SCROLL_DISTANCE}px`);
 
   return measuredHeight;
 }
@@ -134,8 +143,10 @@ function finishClosingMobileMenu() {
   siteNav?.classList.remove("open");
   siteHeader?.classList.remove("mobile-menu-open");
   menuToggle?.setAttribute("aria-expanded", "false");
-  menuTouchY = null;
   menuProgress = 0;
+  if (siteNav) {
+    siteNav.scrollTop = 0;
+  }
   siteHeader?.style.setProperty("--menu-progress", "0");
   siteHeader?.style.setProperty("--menu-current-height", "0px");
   updateBodyScrollLock();
@@ -166,10 +177,12 @@ function openMobileMenu() {
   siteNav.classList.add("open");
   siteHeader.classList.add("mobile-menu-open");
   menuToggle?.setAttribute("aria-expanded", "true");
+  siteNav.scrollTop = 0;
   applyMobileMenuProgress(0);
   syncMobileMenuMetrics();
 
   requestAnimationFrame(() => {
+    siteNav.scrollTop = 0;
     applyMobileMenuProgress(1);
   });
 
@@ -183,8 +196,6 @@ function closeMobileMenu(options = {}) {
     return;
   }
 
-  menuTouchY = null;
-
   if (immediate || !siteNav.classList.contains("open")) {
     finishClosingMobileMenu();
     return;
@@ -193,31 +204,6 @@ function closeMobileMenu(options = {}) {
   applyMobileMenuProgress(0);
   scheduleClosingMobileMenu();
   updateBodyScrollLock();
-}
-
-function adjustMobileMenuByDelta(deltaY) {
-  if (!isMobileMenuOpen()) {
-    return false;
-  }
-
-  if (Math.abs(deltaY) < 0.5) {
-    return false;
-  }
-
-  startMenuGestureState();
-
-  if (menuCloseTimeout !== null) {
-    window.clearTimeout(menuCloseTimeout);
-    menuCloseTimeout = null;
-  }
-
-  applyMobileMenuProgress(menuProgress - deltaY / MENU_SCROLL_DISTANCE);
-
-  if (menuProgress <= MENU_CLOSE_THRESHOLD) {
-    finishClosingMobileMenu();
-  }
-
-  return true;
 }
 
 function normalizeWheelDelta(event) {
@@ -230,6 +216,31 @@ function normalizeWheelDelta(event) {
   }
 
   return event.deltaY;
+}
+
+function handleMobileMenuScroll() {
+  if (!isMobileMenuOpen() || !siteNav) {
+    return;
+  }
+
+  startMenuGestureState();
+
+  if (menuCloseTimeout !== null) {
+    window.clearTimeout(menuCloseTimeout);
+    menuCloseTimeout = null;
+  }
+
+  const clampedScrollTop = Math.max(0, Math.min(siteNav.scrollTop, MENU_SCROLL_DISTANCE));
+
+  if (clampedScrollTop !== siteNav.scrollTop) {
+    siteNav.scrollTop = clampedScrollTop;
+  }
+
+  applyMobileMenuProgress(1 - clampedScrollTop / MENU_SCROLL_DISTANCE);
+
+  if (menuProgress <= MENU_CLOSE_THRESHOLD) {
+    finishClosingMobileMenu();
+  }
 }
 
 const modalContent = {
@@ -495,61 +506,22 @@ updateUniverseBackground();
 updateMobileHeaderState();
 window.addEventListener("scroll", updateUniverseBackground, { passive: true });
 window.addEventListener("scroll", updateMobileHeaderState, { passive: true });
+siteNav?.addEventListener("scroll", handleMobileMenuScroll, { passive: true });
 window.addEventListener(
   "wheel",
   (event) => {
-    if (!isMobileMenuOpen()) {
+    if (!isMobileMenuOpen() || !siteNav || siteHeader?.contains(event.target)) {
       return;
     }
 
     event.preventDefault();
-    adjustMobileMenuByDelta(normalizeWheelDelta(event));
+    siteNav.scrollTop = Math.max(
+      0,
+      Math.min(siteNav.scrollTop + normalizeWheelDelta(event), MENU_SCROLL_DISTANCE)
+    );
   },
   { passive: false }
 );
-window.addEventListener(
-  "touchstart",
-  (event) => {
-    if (!isMobileMenuOpen()) {
-      menuTouchY = null;
-      return;
-    }
-
-    menuTouchY = event.touches[0]?.clientY ?? null;
-  },
-  { passive: true }
-);
-window.addEventListener(
-  "touchmove",
-  (event) => {
-    if (!isMobileMenuOpen()) {
-      menuTouchY = null;
-      return;
-    }
-
-    const currentTouchY = event.touches[0]?.clientY;
-
-    if (typeof currentTouchY !== "number") {
-      return;
-    }
-
-    if (menuTouchY === null) {
-      menuTouchY = currentTouchY;
-      return;
-    }
-
-    event.preventDefault();
-    adjustMobileMenuByDelta(menuTouchY - currentTouchY);
-    menuTouchY = currentTouchY;
-  },
-  { passive: false }
-);
-window.addEventListener("touchend", () => {
-  menuTouchY = null;
-});
-window.addEventListener("touchcancel", () => {
-  menuTouchY = null;
-});
 window.addEventListener("resize", () => {
   updateUniverseBackground();
   updateMobileHeaderState();
