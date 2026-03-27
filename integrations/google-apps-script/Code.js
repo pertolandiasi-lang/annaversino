@@ -2,7 +2,7 @@ const CONFIG = {
   spreadsheetId: "",
   leadsSheetName: "Leads",
   dashboardSheetName: "Dashboard",
-  notificationEmail: "",
+  notificationEmail: "vulvaverse@gmail.com",
   sendNotificationEmails: true,
   allowedTopics: [
     "How you met your Vulva",
