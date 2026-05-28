@@ -1422,8 +1422,11 @@ h3 {
   }
 
   .hero {
-    min-height: auto;
-    padding-top: 104px;
+    /* Use dvh so the hero fills the actual visible viewport on
+       both Safari and Chrome mobile (accounts for the URL bar). */
+    min-height: 100dvh;
+    padding-top: calc(var(--header-offset, 130px) + 20px);
+    padding-bottom: 32px;
   }
 
   .discover-card {
