@@ -1460,15 +1460,6 @@ h3 {
   background: transparent;
 }
 
-/* Each PDF page has a top-darker-to-bottom-lighter gradient, so the
-   raw seam between two pages looks like a hard color step. Pull each
-   subsequent page up substantially AND fade its top edge into
-   transparent — the gradient becomes invisible. */
-#modal-body .modal-page + .modal-page {
-  margin-top: -28px;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 56px);
-          mask-image: linear-gradient(to bottom, transparent 0, #000 56px);
-}
 
 
 /* Round only the very first and last edges so the document looks
