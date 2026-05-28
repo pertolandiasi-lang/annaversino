@@ -1250,7 +1250,25 @@ h3 {
     z-index: 0;
     transition:
       height 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-      border-radius 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+      border-radius 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      background 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      backdrop-filter 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      -webkit-backdrop-filter 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* When the menu is open the bar+menu shell becomes a proper
+     frosted-glass overlay so page content is no longer legible
+     behind the nav links. */
+  .site-header.mobile-menu-open .site-header-bar::before {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
+      rgba(18, 12, 44, 0.96);
+    backdrop-filter: blur(32px) saturate(180%);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    box-shadow:
+      0 36px 70px rgba(6, 3, 20, 0.38),
+      inset 0 1px 0 rgba(255, 255, 255, 0.10);
   }
 
   .site-header-bar > * {
