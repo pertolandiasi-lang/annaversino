@@ -1429,21 +1429,51 @@ h3 {
   margin-top: 14px;
 }
 
+/* When the modal shows PDF pages, edge-to-edge them so the whole
+   modal-panel becomes one continuous scrolling document. The panel
+   side padding is overridden in the open state below. */
+.modal-panel:has(#modal-body.modal-body-pages) {
+  padding: 0;
+}
+
+.modal-panel:has(#modal-body.modal-body-pages) #modal-kicker,
+.modal-panel:has(#modal-body.modal-body-pages) #modal-title {
+  padding: 30px 30px 0;
+  margin: 0;
+}
+
+.modal-panel:has(#modal-body.modal-body-pages) #modal-title {
+  padding-top: 12px;
+  padding-bottom: 18px;
+}
+
 #modal-body.modal-body-pages {
-  display: grid;
-  gap: 18px;
-  padding: 4px 0;
+  display: block;
+  padding: 0;
+  margin: 0;
 }
 
 #modal-body .modal-page {
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 18px;
-  box-shadow:
-    0 14px 40px rgba(7, 4, 22, 0.40),
-    0 4px 12px rgba(7, 4, 22, 0.20);
-  background: rgba(255, 255, 255, 0.03);
+  margin: 0;
+  border-radius: 0;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* Round only the very first and last edges so the document looks
+   like one elegant capsule rather than disconnected rectangles. */
+#modal-body .modal-page:first-child {
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+}
+
+#modal-body .modal-page:last-child {
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
 }
 
 @media (max-width: 1100px) {
