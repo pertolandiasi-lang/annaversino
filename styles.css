@@ -516,6 +516,15 @@ h3 {
   backdrop-filter: blur(14px) saturate(140%);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
   isolation: isolate;
+}
+
+/* contain:paint only on cards (helps Chrome perf). Header is
+   excluded because its absolutely-positioned mobile menu must
+   render outside the bar — contain would clip it. */
+.feature-card.glass-panel,
+.insight-card.glass-panel,
+.product-tile.glass-panel,
+.blog-item.glass-panel {
   contain: paint;
 }
 

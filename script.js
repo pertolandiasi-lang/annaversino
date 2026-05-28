@@ -637,7 +637,20 @@ function updateUniverseBackground() {
   // Kept as no-op so existing scroll/resize listeners stay valid.
 }
 
+let mobileHeaderFrameId = null;
+
 function updateMobileHeaderState() {
+  if (!siteHeader || mobileHeaderFrameId !== null) {
+    return;
+  }
+
+  mobileHeaderFrameId = window.requestAnimationFrame(() => {
+    mobileHeaderFrameId = null;
+    runMobileHeaderStateUpdate();
+  });
+}
+
+function runMobileHeaderStateUpdate() {
   if (!siteHeader) {
     return;
   }
@@ -653,7 +666,11 @@ function updateMobileHeaderState() {
     return;
   }
 
-  syncMobileMenuMetrics();
+  // Skip metric recalcs while the menu is closed — they read layout
+  // and were the main source of jank when scrolling on mobile.
+  if (isMobileMenuOpen()) {
+    syncMobileMenuMetrics();
+  }
   syncCollapsedHeaderOffset();
   updateBodyScrollLock();
 }
