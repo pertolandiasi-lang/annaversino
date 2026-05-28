@@ -200,11 +200,14 @@ function scheduleClosingMobileMenu() {
     window.clearTimeout(menuCloseTimeout);
   }
 
+  // Wait for the full menu+stagger transition before removing the
+  // .open class. Removing early caused a visible jump at the end
+  // of the close animation (button-triggered close in particular).
   menuCloseTimeout = window.setTimeout(() => {
     if (menuProgress <= MENU_CLOSE_THRESHOLD) {
       finishClosingMobileMenu();
     }
-  }, 220);
+  }, 900);
 }
 
 function openMobileMenu() {
@@ -231,21 +234,17 @@ function openMobileMenu() {
   });
 }
 
-function closeMobileMenu(options = {}) {
-  const { immediate = false } = options;
-
+function closeMobileMenu() {
   if (!siteNav) {
     return;
   }
 
-  if (immediate || !siteNav.classList.contains("open")) {
-    finishClosingMobileMenu();
-    return;
-  }
-
-  applyMobileMenuProgress(0);
-  scheduleClosingMobileMenu();
-  updateBodyScrollLock();
+  // Single-step close — removing .open lets the CSS transitions
+  // animate everything from full-open to closed in one continuous
+  // motion. The previous two-step approach (progress-to-0 then
+  // class removal 900ms later) caused a visible re-trigger at the
+  // end of the animation.
+  finishClosingMobileMenu();
 }
 
 function normalizeWheelDelta(event) {
@@ -656,7 +655,7 @@ function runMobileHeaderStateUpdate() {
   }
 
   if (!isCollapsedNav()) {
-    closeMobileMenu({ immediate: true });
+    closeMobileMenu();
     return;
   }
 
@@ -710,7 +709,7 @@ navLinks.forEach((link) => {
     event.preventDefault();
 
     if (isCollapsedNav()) {
-      closeMobileMenu({ immediate: true });
+      closeMobileMenu();
     }
 
     scrollToSection(targetId);
