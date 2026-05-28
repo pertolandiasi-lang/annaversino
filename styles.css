@@ -1430,9 +1430,20 @@ h3 {
 }
 
 /* When the modal shows PDF pages, edge-to-edge them so the whole
-   modal-panel becomes one continuous scrolling document. */
+   modal-panel becomes one continuous scrolling document. The panel
+   itself clips with rounded corners; the inner body scrolls. */
 .modal-panel:has(#modal-body.modal-body-pages) {
   padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-panel:has(#modal-body.modal-body-pages) #modal-body.modal-body-pages {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* In PDF mode the title is already baked into page 1 of the

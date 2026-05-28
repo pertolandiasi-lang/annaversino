@@ -345,12 +345,12 @@ const modalContent = {
     kicker: "Blog",
     title: "Becoming Vulvaverse",
     pages: [
-      "assets/vulvaverse/story-becoming/page-1.jpg?v=11",
-      "assets/vulvaverse/story-becoming/page-2.jpg?v=11",
-      "assets/vulvaverse/story-becoming/page-3.jpg?v=11",
-      "assets/vulvaverse/story-becoming/page-4.jpg?v=11",
-      "assets/vulvaverse/story-becoming/page-5.jpg?v=11",
-      "assets/vulvaverse/story-becoming/page-6.jpg?v=11"
+      "assets/vulvaverse/story-becoming/page-1.jpg?v=12",
+      "assets/vulvaverse/story-becoming/page-2.jpg?v=12",
+      "assets/vulvaverse/story-becoming/page-3.jpg?v=12",
+      "assets/vulvaverse/story-becoming/page-4.jpg?v=12",
+      "assets/vulvaverse/story-becoming/page-5.jpg?v=12",
+      "assets/vulvaverse/story-becoming/page-6.jpg?v=12"
     ],
     body: [
       "Did this make you a little bit curious — or cringe? Then I highly recommend to continue reading. Maybe you will cringe even more, maybe you will start to wonder what your vulva looks, feels, smells and tastes like. Maybe both. In any case: welcome to the Vulvaverse.",
