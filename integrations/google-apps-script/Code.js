@@ -23,8 +23,12 @@ const LEADS_HEADERS = [
   "Topic",
   "Message",
   "Page URL",
-  "Source"
+  "Source",
+  "Consent",
+  "Fill Seconds"
 ];
+
+const CONTACT_MIN_FILL_SECONDS = 3;
 
 function doGet() {
   try {
@@ -49,7 +53,7 @@ function doPost(e) {
     const payload = parsePayload_(e);
     const lead = validateLeadPayload_(payload);
 
-    if (lead.website) {
+    if (lead.website || lead.submitted_after_seconds < CONTACT_MIN_FILL_SECONDS) {
       return jsonResponse_({
         ok: true,
         ignored: true
@@ -270,7 +274,9 @@ function appendLeadRow_(sheet, lead) {
     lead.topic,
     lead.message,
     lead.page_url,
-    lead.source
+    lead.source,
+    lead.consent,
+    lead.submitted_after_seconds
   ]);
 }
 
@@ -339,11 +345,14 @@ function parsePayload_(e) {
     message: parameter.message,
     page_url: parameter.page_url,
     source: parameter.source,
-    website: parameter.website
+    website: parameter.website,
+    consent: parameter.consent,
+    submitted_after_seconds: parameter.submitted_after_seconds
   };
 }
 
 function validateLeadPayload_(payload) {
+  const fillSecondsRaw = Number(payload.submitted_after_seconds);
   const lead = {
     first_name: cleanString_(payload.first_name),
     last_name: cleanString_(payload.last_name),
@@ -352,10 +361,12 @@ function validateLeadPayload_(payload) {
     message: cleanString_(payload.message),
     page_url: cleanString_(payload.page_url),
     source: cleanString_(payload.source) || "website-contact-form",
-    website: cleanString_(payload.website)
+    website: cleanString_(payload.website),
+    consent: cleanString_(payload.consent),
+    submitted_after_seconds: isFinite(fillSecondsRaw) ? fillSecondsRaw : 0
   };
 
-  if (lead.website) {
+  if (lead.website || lead.submitted_after_seconds < CONTACT_MIN_FILL_SECONDS) {
     return lead;
   }
 
@@ -375,6 +386,9 @@ function validateLeadPayload_(payload) {
   }
   if (!lead.message) {
     missingFields.push("message");
+  }
+  if (!lead.consent) {
+    missingFields.push("consent");
   }
 
   if (missingFields.length > 0) {

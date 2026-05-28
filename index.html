@@ -19,7 +19,7 @@
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260327-contactform2" />
+    <link rel="stylesheet" href="styles.css?v=20260528-gdpr1" />
   </head>
   <body>
     <div class="site-background" aria-hidden="true"></div>
@@ -528,6 +528,13 @@
                       autocomplete="off"
                     />
                   </label>
+                  <label class="form-consent">
+                    <input id="consent" name="consent" type="checkbox" required />
+                    <span>
+                      I agree to be contacted about my inquiry and accept the
+                      <button type="button" class="text-link" data-modal="privacy">privacy terms</button>.
+                    </span>
+                  </label>
                   <div class="contact-form-actions">
                     <button class="button" id="contact-submit" type="submit">Submit</button>
                     <p class="form-note" id="form-note" role="status" aria-live="polite"></p>
@@ -572,6 +579,6 @@
       </div>
     </div>
 
-    <script src="script.js?v=20260327-contactform2"></script>
+    <script src="script.js?v=20260528-gdpr1"></script>
   </body>
 </html>

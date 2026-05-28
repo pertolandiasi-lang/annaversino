@@ -15,6 +15,8 @@ const siteHeader = document.querySelector(".site-header");
 const siteHeaderBar = siteHeader?.querySelector(".site-header-bar");
 const CONTACT_FORM_SOURCE_FALLBACK = "website-contact-form";
 const CONTACT_FORM_ENDPOINT_PLACEHOLDER = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+const CONTACT_FORM_MIN_FILL_SECONDS = 3;
+const contactFormReadyAt = Date.now();
 if (siteNav && !siteNav.querySelector(".site-nav-links")) {
   const navLinksWrapper = document.createElement("div");
   navLinksWrapper.className = "site-nav-links";
@@ -360,6 +362,16 @@ const modalContent = {
     body: [
       "Do you knoe the true size of your Clit?"
     ]
+  },
+  privacy: {
+    kicker: "Privacy",
+    title: "How we handle your data",
+    body: [
+      "Your name, email, topic and message are sent to a private Google Sheet that only Anna can access. A notification is also emailed to vulvaverse@gmail.com so we can reply.",
+      "Your data is used only to respond to your inquiry. It is never sold, shared with third parties, or used for marketing.",
+      "You can request a copy or full deletion of your data at any time by emailing vulvaverse@gmail.com.",
+      "Submissions are stored only as long as needed to handle your request."
+    ]
   }
 };
 
@@ -546,9 +558,16 @@ contactForm?.addEventListener("submit", async (event) => {
   const topic = document.getElementById("help-topic").value.trim();
   const message = document.getElementById("message").value.trim();
   const website = document.getElementById("website").value.trim();
+  const consentGiven = document.getElementById("consent").checked;
+  const elapsedSeconds = (Date.now() - contactFormReadyAt) / 1000;
 
   if (!firstName || !lastName || !email || !topic || !message) {
     setContactFormNote("Please complete all required fields.", "error");
+    return;
+  }
+
+  if (!consentGiven) {
+    setContactFormNote("Please accept the privacy terms to continue.", "error");
     return;
   }
 
@@ -560,7 +579,7 @@ contactForm?.addEventListener("submit", async (event) => {
     return;
   }
 
-  if (website) {
+  if (website || elapsedSeconds < CONTACT_FORM_MIN_FILL_SECONDS) {
     contactForm.reset();
     setContactFormNote("Thanks, we received your submission.", "success");
     return;
@@ -574,7 +593,9 @@ contactForm?.addEventListener("submit", async (event) => {
     message,
     page_url: window.location.href,
     source: contactForm.dataset.source?.trim() || CONTACT_FORM_SOURCE_FALLBACK,
-    website
+    website,
+    consent: consentGiven ? "yes" : "",
+    submitted_after_seconds: Math.round(elapsedSeconds)
   };
 
   try {
