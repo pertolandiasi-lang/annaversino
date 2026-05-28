@@ -1430,21 +1430,33 @@ h3 {
 }
 
 /* When the modal shows PDF pages, edge-to-edge them so the whole
-   modal-panel becomes one continuous scrolling document. The panel
-   side padding is overridden in the open state below. */
+   modal-panel becomes one continuous scrolling document. */
 .modal-panel:has(#modal-body.modal-body-pages) {
   padding: 0;
+  overflow: hidden;
 }
 
-.modal-panel:has(#modal-body.modal-body-pages) #modal-kicker,
+/* Hide the kicker on PDF mode — the chunky title carries the page */
+.modal-panel:has(#modal-body.modal-body-pages) #modal-kicker {
+  display: none;
+}
+
+/* Style modal-title as a starry banner that visually continues
+   into page 1 of the PDF. The chunky font echoes the original
+   'VULVAVERSE' headline from the document. */
 .modal-panel:has(#modal-body.modal-body-pages) #modal-title {
-  padding: 30px 30px 0;
   margin: 0;
-}
-
-.modal-panel:has(#modal-body.modal-body-pages) #modal-title {
-  padding-top: 12px;
-  padding-bottom: 18px;
+  padding: 56px 24px 28px;
+  background: #0d0a28;
+  color: var(--white);
+  font-family: "Bagel Fat One", "Cormorant Garamond", serif;
+  font-weight: 400;
+  font-size: clamp(2.4rem, 8vw, 4rem);
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-transform: none;
+  line-height: 1;
+  text-shadow: 0 4px 18px rgba(7, 4, 22, 0.5);
 }
 
 #modal-body.modal-body-pages {
@@ -1466,14 +1478,34 @@ h3 {
 
 /* Round only the very first and last edges so the document looks
    like one elegant capsule rather than disconnected rectangles. */
-#modal-body .modal-page:first-child {
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
-}
-
 #modal-body .modal-page:last-child {
   border-bottom-left-radius: 24px;
   border-bottom-right-radius: 24px;
+}
+
+/* Full-screen modal on mobile so the PDF pages get maximum width
+   and are easier to read without zooming. */
+@media (max-width: 760px) {
+  .modal {
+    padding: 0;
+  }
+
+  .modal-panel {
+    width: 100%;
+    max-height: 100dvh;
+    height: 100dvh;
+    border-radius: 0;
+    border: 0;
+  }
+
+  .modal-panel:has(#modal-body.modal-body-pages) #modal-body .modal-page:last-child {
+    border-radius: 0;
+  }
+
+  .modal-close {
+    top: 14px;
+    right: 14px;
+  }
 }
 
 @media (max-width: 1100px) {
