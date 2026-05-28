@@ -319,9 +319,9 @@ const modalContent = {
   },
   join: {
     kicker: "Join Vulvaverse",
-    title: "Step Into The Space",
+    title: "Step Into The Vulvaverse",
     body: [
-      "Join Vulvaverse through workshops, 1:1 sessions, community conversations, and collaborations centered on body knowledge, celebration, and reclaiming the vulva from shame.",
+      "Join Vulvaverse through workshops, 1:1 sessions, community conversations, and collaborations centered on body knowledge, celebration, and reclaiming the vulva from shame. Actively create visibility and get your very own vulvastic jewellery piece, wear it as necklace, earrings on your keychain, or as a charm on your bag - be the conversation starter!",
       "If you want to connect directly, scroll to the Contact section or reach out via vulvaverse@gmail.com and Instagram @vul_vaverse."
     ]
   },
