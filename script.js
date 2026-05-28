@@ -723,9 +723,74 @@ updateMobileHeaderState();
 // Header offset only depends on viewport, not scroll — compute on resize only.
 window.addEventListener("scroll", updateUniverseBackground, { passive: true });
 window.addEventListener("scroll", updateMobileHeaderState, { passive: true });
-// Scroll/touch gestures used to auto-close the menu progressively,
-// which felt jittery. Menu now closes only via explicit action
-// (tap a link, tap Menu again, tap outside, or press Escape).
+// Finger-following menu close: while the menu is open, dragging up
+// shrinks it 1:1 with the finger. On release, it snaps open or closed
+// depending on how far you dragged. CSS transitions are disabled
+// mid-drag so the menu stays glued to the finger.
+let menuDragStartY = null;
+let menuDragStartProgress = 1;
+let menuDragActive = false;
+
+document.addEventListener(
+  "touchstart",
+  (event) => {
+    if (!isMobileMenuOpen()) {
+      menuDragStartY = null;
+      return;
+    }
+    const touch = event.touches[0];
+    if (!touch) return;
+    menuDragStartY = touch.clientY;
+    menuDragStartProgress = menuProgress;
+    menuDragActive = false;
+  },
+  { passive: true, capture: true }
+);
+
+document.addEventListener(
+  "touchmove",
+  (event) => {
+    if (!isMobileMenuOpen() || menuDragStartY === null) return;
+    const touch = event.touches[0];
+    if (!touch) return;
+
+    const deltaY = menuDragStartY - touch.clientY;
+    const openHeight = menuOpenHeight || syncMobileMenuMetrics();
+    if (openHeight < 1) return;
+
+    if (!menuDragActive && Math.abs(deltaY) < 6) return;
+
+    if (!menuDragActive) {
+      menuDragActive = true;
+      siteHeader?.classList.add("menu-dragging");
+    }
+
+    event.preventDefault();
+    const nextProgress = menuDragStartProgress - deltaY / openHeight;
+    applyMobileMenuProgress(Math.max(0, Math.min(1, nextProgress)));
+  },
+  { passive: false, capture: true }
+);
+
+function endMenuDrag() {
+  if (!menuDragActive) {
+    menuDragStartY = null;
+    return;
+  }
+  siteHeader?.classList.remove("menu-dragging");
+
+  if (menuProgress < 0.5) {
+    finishClosingMobileMenu();
+  } else {
+    applyMobileMenuProgress(1);
+  }
+
+  menuDragStartY = null;
+  menuDragActive = false;
+}
+
+document.addEventListener("touchend", endMenuDrag, { passive: true, capture: true });
+document.addEventListener("touchcancel", endMenuDrag, { passive: true, capture: true });
 window.addEventListener("resize", () => {
   updateUniverseBackground();
   syncCollapsedHeaderOffset();

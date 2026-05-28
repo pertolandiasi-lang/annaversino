@@ -543,13 +543,14 @@ h3 {
 }
 
 /* Header keeps backdrop-filter — small area, big visual gain.
-   Without it, page content scrolls visibly through the bar. */
+   Higher alpha keeps the tint stable while scrolling so the bar
+   doesn't visibly shift color as different sections pass behind. */
 .site-header-bar.glass-panel {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03)),
-    rgba(22, 16, 54, 0.45);
-  backdrop-filter: blur(22px) saturate(160%);
-  -webkit-backdrop-filter: blur(22px) saturate(160%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.02)),
+    rgba(20, 14, 48, 0.78);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
 }
 
 .glass-group {
@@ -1239,13 +1240,13 @@ h3 {
     border: 1px solid var(--panel-line);
     border-radius: 34px;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03)),
-      rgba(22, 16, 54, 0.45);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.02)),
+      rgba(20, 14, 48, 0.78);
     box-shadow:
       0 28px 54px rgba(6, 3, 20, 0.14),
       inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(22px) saturate(160%);
-    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
     pointer-events: none;
     z-index: 0;
     transition:
@@ -1755,8 +1756,11 @@ h3 {
 
 .site-header.menu-scrolling .site-nav,
 .site-header.menu-scrolling .site-nav a,
-.site-header.menu-scrolling .mobile-nav-preview {
-  transition-duration: 0s;
+.site-header.menu-scrolling .mobile-nav-preview,
+.site-header.menu-dragging .site-nav,
+.site-header.menu-dragging .site-nav a {
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
 }
 
 @media (max-width: 520px) {
