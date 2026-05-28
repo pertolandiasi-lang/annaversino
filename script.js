@@ -344,6 +344,14 @@ const modalContent = {
   "story-journey": {
     kicker: "Blog",
     title: "Becoming Vulvaverse",
+    pages: [
+      "assets/vulvaverse/story-becoming/page-1.jpg",
+      "assets/vulvaverse/story-becoming/page-2.jpg",
+      "assets/vulvaverse/story-becoming/page-3.jpg",
+      "assets/vulvaverse/story-becoming/page-4.jpg",
+      "assets/vulvaverse/story-becoming/page-5.jpg",
+      "assets/vulvaverse/story-becoming/page-6.jpg"
+    ],
     body: [
       "Did this make you a little bit curious — or cringe? Then I highly recommend to continue reading. Maybe you will cringe even more, maybe you will start to wonder what your vulva looks, feels, smells and tastes like. Maybe both. In any case: welcome to the Vulvaverse.",
       "I'm Anna — an anthropologist and the founder of Vulvaverse.",
@@ -403,6 +411,15 @@ function setModalContent(key) {
 
   modalKicker.textContent = content.kicker;
   modalTitle.textContent = content.title;
+  modalBody.classList.toggle("modal-body-pages", !!content.pages);
+
+  if (content.pages) {
+    modalBody.innerHTML = content.pages
+      .map((src, i) => `<img class="modal-page" src="${src}" alt="Page ${i + 1}" loading="lazy" />`)
+      .join("");
+    return;
+  }
+
   modalBody.innerHTML = content.body.map((paragraph) => `<p>${paragraph}</p>`).join("");
 }
 
