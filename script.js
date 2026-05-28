@@ -311,10 +311,17 @@ function applyMenuGestureDelta(deltaY) {
 const modalContent = {
   mission: {
     kicker: "Vulvastic Mission",
-    title: "Reshaping the Way We Speak of the Vulva",
+    title: "Welcome to the Vulvaverse",
     body: [
-      "Vulvaverse is a space dedicated to breaking down barriers of stigma and taboo. We foster significant body knowledge, ensuring the vulva is recognized for its unique beauty and distinguished from the vagina.",
-      "Join us in celebrating a part of ourselves that is rich with stories, shaped by culture, yet entirely our own."
+      "I looked in to the mirror wherein I met my vulva.",
+      "Hold on — what? You met your vulva, why would you do that, you might wonder. Let me ask you: have you met your vulva? Do you know what yours looks, feels, smells and tastes like?",
+      "When I look into the world I truly see a vulvaverse! So many things are vulva-shaped: flowers and plants, cut-open fruits, or even holy figures such as no other than the holy mother Mary — Jesus' mom.",
+      "Yet the genital itself is loaded and surrounded with tons of shame, stigma and an extra portion of lack of knowledge. I want to break through the wall of shame and stigma and replace it with pride and acceptance. And transform lack of knowledge into knowledge and body confidence.",
+      "Because knowledge is power — and we need to gain power and autonomy over our own bodies, as well as a language to name it. So we can stand up and fight for our rights, so we know when something feels off with our body to stay stubborn and get checked instead of being sent away.",
+      "The mysterious absence of information about the vulva is like a blank spot on Google Maps, and I founded Vulvaverse to fill in this spot.",
+      "But I cannot fill this spot by myself — that's why I need you. Together we build a community so powerful that unveils the vulva's forgotten history, cultural meaning and holiness.",
+      "With diverse workshops around the vulva from socio-cultural perspectives up to anatomy deep-dives, and designing vulvastic jewellery and accessories to create visibility that lets everyone realise that we truly live in a Vulvaverse.",
+      "Enjoy exploring the Vulvaverse!"
     ]
   },
   join: {
