@@ -352,12 +352,12 @@ const modalContent = {
     kicker: "Blog",
     title: "Becoming Vulvaverse",
     pages: [
-      "assets/vulvaverse/story-becoming/page-1.jpg?v=15",
-      "assets/vulvaverse/story-becoming/page-2.jpg?v=15",
-      "assets/vulvaverse/story-becoming/page-3.jpg?v=15",
-      "assets/vulvaverse/story-becoming/page-4.jpg?v=15",
-      "assets/vulvaverse/story-becoming/page-5.jpg?v=15",
-      "assets/vulvaverse/story-becoming/page-6.jpg?v=15"
+      "assets/vulvaverse/story-becoming/page-1.jpg?v=16",
+      "assets/vulvaverse/story-becoming/page-2.jpg?v=16",
+      "assets/vulvaverse/story-becoming/page-3.jpg?v=16",
+      "assets/vulvaverse/story-becoming/page-4.jpg?v=16",
+      "assets/vulvaverse/story-becoming/page-5.jpg?v=16",
+      "assets/vulvaverse/story-becoming/page-6.jpg?v=16"
     ],
     body: [
       "Did this make you a little bit curious — or cringe? Then I highly recommend to continue reading. Maybe you will cringe even more, maybe you will start to wonder what your vulva looks, feels, smells and tastes like. Maybe both. In any case: welcome to the Vulvaverse.",
@@ -719,15 +719,22 @@ function getHeaderOffset() {
 }
 
 function scrollToSection(targetId) {
+  // 'Home' returns to the absolute top of the page so the hero is
+  // perfectly framed (and Safari's URL bar collapse animates from
+  // its full state).
+  if (targetId === "home") {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+
   const target = document.getElementById(targetId);
 
   if (!target) {
     return;
   }
 
-  // Scroll so the section's HEADING (not its outer padding) lands
-  // right below the floating header. This keeps the title tight to
-  // the header on every click instead of a big empty gap.
+  // For other sections, scroll so the section's HEADING (not its
+  // outer padding) lands right below the floating header.
   const heading =
     target.querySelector(".section-heading h2") ||
     target.querySelector("h1, h2, h3") ||
