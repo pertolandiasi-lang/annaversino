@@ -343,9 +343,29 @@ const modalContent = {
   },
   "story-journey": {
     kicker: "Blog",
-    title: "My Journey from coach to Jewelery designer",
+    title: "Becoming Vulvaverse",
     body: [
-      "While I was pitching my workshops and ended up creating Jewelery and selling them on markets."
+      "Did this make you a little bit curious — or cringe? Then I highly recommend to continue reading. Maybe you will cringe even more, maybe you will start to wonder what your vulva looks, feels, smells and tastes like. Maybe both. In any case: welcome to the Vulvaverse.",
+      "I'm Anna — an anthropologist and the founder of Vulvaverse.",
+      "I looked into the mirror, and that is where I met my vulva. \"Hold on, what? You met your vulva — why would you do that?\" you might wonder. Let me ask you back: have you met your vulva? Do you know what she looks, feels, smells and tastes like?",
+      "It was here that I fell into a giant and collective gap of knowledge — the mysterious absence of information about the vulva. Just like a blank spot on Google Maps.",
+      "My studies in anthropology have taken me across diverse cultures and continents, studying the interaction of humans with each other and with their own bodies — how differently bodies are used as tools of communication, and as a scale of how we hold ourselves in the world. Along the way, I found my niche in feminist and gender studies.",
+      "And yet, this knowledge isn't lost — it has always been there, tucked away in the annals of history, waiting to be uncovered. I firmly believe that understanding our bodies, particularly the vulva, is not just essential but empowering.",
+      "If it's not on the radar of biology or feminist studies, how do we expect anyone else to access it? That realization sparked the birth of Vulvaverse — a platform aimed at bringing this invaluable knowledge to light and empowering individuals everywhere.",
+      "Ever since I stumbled over so much forgotten, patriarchy-erased knowledge, I couldn't stop thinking about this gap. I started to dig deeper. That's the anthropologist in me, I guess — and that's the reason I founded Vulvaverse.",
+      "It's more than a platform with workshops and beautiful jewellery. It's a community where this vital knowledge is archived and made available to everyone. Here we come together to share, teach and exchange stories. It's about reclaiming the power that comes with understanding our bodies and the stories they tell us.",
+      "My ultimate goal is to make sure that when I say \"vulva,\" there's no confusion with the vagina — and that I don't hear shameful giggling but rather proud and confident voices. I want everyone to appreciate the deep knowledge, beauty and uniqueness that every vulva holds.",
+      "Let's banish the unnecessary shame society has placed upon the vulva. Because — why should we speak shamefully of something that is the source of life itself?",
+      "Join me in celebrating the wonder of the vulva, uncovering ancient knowledge, and embracing our bodies with confidence and understanding.",
+      "How can you have a truly satisfied (sex) life if you don't know your vulva — if you don't know where your vulva ends and your vagina starts, or what the difference between the two even is? No worries: you can discover it all with me.",
+      "To form a genuine connection to your vulva, it is essential to name the parts correctly and know all the details. And I highly recommend discovering the true size and power of the clitoris too (I promise you will not regret it, and you can thank me later).",
+      "Each and every vulva is unique and comes in all shapes, forms and sizes — and they are all good as they are. None is better than the other; they are allowed to simply exist next to each other, without taking anything away, without the pressure to look alike. They are here to empower and support.",
+      "I invite you to participate in either my workshop \"Mirror, Mirror — Oh Vulvina!\" or my 1:1 session \"How You Met Your Vulva\" — or both — to meet and learn about your vulva, and get a better understanding of the signals she is sending you. Through this we can dismantle the layers of shame and invisibility vulvas are covered under.",
+      "Alongside the workshop and 1:1 session comes my workbook \"Let Me Introduce You to Your Vulva — a guide to meet your vulva.\" Of course you can also get the workbook on its own and meet your vulva by yourself — it will still have great value.",
+      "With VulvaTalks I want to overcome the awkwardness around simply talking about our genitals. Let's establish that we can speak about vulvas casually, in every situation. There is no need to be shy. Together we can gather so much significant body knowledge — and even if you feel you don't know enough, I'm sure you know something, and together we'll figure out the rest.",
+      "I want to emphasise that Vulvaverse is for everyone with a vulva, regardless of gender. If you encounter any barriers, please let me know and I'll do everything in my power to remove them. Vulvaverse is a safer, inclusive space, free from hate, and open to understanding others' perspectives. Let's remember to be kind and respectful to one another.",
+      "Take your time deciding how you'd like to embark on your journey to connect with your vulva — whether starting with the workbook, diving into a single course, or jumping right into a workshop for a group experience. If you need more information, feel free to slide into my DMs (@vul_vaverse) or send me an email (vulvaverse@gmail.com).",
+      "Have a vulvastic day — Anna Katharina"
     ]
   },
   "story-anatomy": {
