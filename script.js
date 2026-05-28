@@ -369,8 +369,8 @@ const modalContent = {
     body: [
       "Your name, email, topic and message are sent to a private Google Sheet that only Anna can access. A notification is also emailed to vulvaverse@gmail.com so we can reply.",
       "Your data is used only to respond to your inquiry. It is never sold, shared with third parties, or used for marketing.",
-      "You can request a copy or full deletion of your data at any time by emailing vulvaverse@gmail.com.",
-      "Submissions are stored only as long as needed to handle your request."
+      "Submissions are stored for up to 12 months and then automatically deleted.",
+      "You can request a copy or earlier deletion of your data at any time by emailing vulvaverse@gmail.com."
     ]
   }
 };

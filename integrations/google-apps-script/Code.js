@@ -29,6 +29,8 @@ const LEADS_HEADERS = [
 ];
 
 const CONTACT_MIN_FILL_SECONDS = 3;
+const LEAD_RETENTION_MONTHS = 12;
+const PURGE_TRIGGER_HANDLER = "purgeOldLeads";
 
 function doGet() {
   try {
@@ -96,6 +98,51 @@ function refreshContactDashboard() {
   SpreadsheetApp.flush();
 
   return "Dashboard refreshed.";
+}
+
+function purgeOldLeads() {
+  const spreadsheet = getSpreadsheet_();
+  const sheet = ensureLeadsSheet_(spreadsheet);
+  const lastRow = sheet.getLastRow();
+
+  if (lastRow < 2) {
+    return "No leads to purge.";
+  }
+
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - LEAD_RETENTION_MONTHS);
+
+  const submittedAtColumn = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  const rowsToDelete = [];
+
+  for (let i = 0; i < submittedAtColumn.length; i++) {
+    const value = submittedAtColumn[i][0];
+    if (value instanceof Date && value < cutoff) {
+      rowsToDelete.push(i + 2);
+    }
+  }
+
+  for (let i = rowsToDelete.length - 1; i >= 0; i--) {
+    sheet.deleteRow(rowsToDelete[i]);
+  }
+
+  return "Deleted " + rowsToDelete.length + " row(s) older than " + LEAD_RETENTION_MONTHS + " months.";
+}
+
+function installMonthlyPurge() {
+  ScriptApp.getProjectTriggers().forEach(function (trigger) {
+    if (trigger.getHandlerFunction() === PURGE_TRIGGER_HANDLER) {
+      ScriptApp.deleteTrigger(trigger);
+    }
+  });
+
+  ScriptApp.newTrigger(PURGE_TRIGGER_HANDLER)
+    .timeBased()
+    .onMonthDay(1)
+    .atHour(3)
+    .create();
+
+  return "Monthly purge scheduled for the 1st of each month at ~3am.";
 }
 
 function sendTestNotification() {
