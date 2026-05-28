@@ -681,9 +681,17 @@ function scrollToSection(targetId) {
     return;
   }
 
+  // Scroll so the section's HEADING (not its outer padding) lands
+  // right below the floating header. This keeps the title tight to
+  // the header on every click instead of a big empty gap.
+  const heading =
+    target.querySelector(".section-heading h2") ||
+    target.querySelector("h1, h2, h3") ||
+    target;
+
   const offset = getHeaderOffset();
-  const targetTop = target.getBoundingClientRect().top + window.scrollY;
-  const nextTop = Math.max(targetTop - offset, 0);
+  const targetTop = heading.getBoundingClientRect().top + window.scrollY;
+  const nextTop = Math.max(targetTop - offset - 16, 0);
 
   window.scrollTo({
     top: nextTop,

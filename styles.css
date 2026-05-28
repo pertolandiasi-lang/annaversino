@@ -782,7 +782,9 @@ h3 {
 }
 
 .next-event-ticker.is-ready {
-  display: inline-block;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
   animation: ticker-fade-in 0.7s var(--ease-luxe) both;
 }
 
