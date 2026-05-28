@@ -1469,28 +1469,23 @@ h3 {
   border-bottom-right-radius: 24px;
 }
 
-/* Full-screen modal on mobile so the PDF pages get maximum width
-   and are easier to read without zooming. */
+/* Mobile: keep the modal as a proper rounded popup (not full-screen).
+   Small side gutters so pages can fill width while corners stay
+   rounded on both top AND bottom. */
 @media (max-width: 760px) {
   .modal {
-    padding: 0;
+    padding: 12px 8px;
   }
 
   .modal-panel {
     width: 100%;
-    max-height: 100dvh;
-    height: 100dvh;
-    border-radius: 0;
-    border: 0;
-  }
-
-  .modal-panel:has(#modal-body.modal-body-pages) #modal-body .modal-page:last-child {
-    border-radius: 0;
+    max-height: calc(100dvh - 24px);
+    border-radius: 24px;
   }
 
   .modal-close {
-    top: 14px;
-    right: 14px;
+    top: 12px;
+    right: 12px;
   }
 }
 
