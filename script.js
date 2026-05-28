@@ -632,21 +632,27 @@ contactForm?.addEventListener("submit", async (event) => {
   }
 });
 
+let backgroundFrameId = null;
+
 function updateUniverseBackground() {
-  if (!siteBackground) {
+  if (!siteBackground || backgroundFrameId !== null) {
     return;
   }
 
-  const maxScroll = Math.max(
-    document.documentElement.scrollHeight - window.innerHeight,
-    1
-  );
-  const progress = Math.min(window.scrollY / maxScroll, 1);
-  const startOffset = 48;
-  const endOffset = -48;
-  const offset = startOffset + (endOffset - startOffset) * progress;
+  backgroundFrameId = window.requestAnimationFrame(() => {
+    backgroundFrameId = null;
 
-  siteBackground.style.setProperty("--bg-shift", `${offset}px`);
+    const maxScroll = Math.max(
+      document.documentElement.scrollHeight - window.innerHeight,
+      1
+    );
+    const progress = Math.min(window.scrollY / maxScroll, 1);
+    const startOffset = 48;
+    const endOffset = -48;
+    const offset = startOffset + (endOffset - startOffset) * progress;
+
+    siteBackground.style.setProperty("--bg-shift", `${offset}px`);
+  });
 }
 
 function updateMobileHeaderState() {

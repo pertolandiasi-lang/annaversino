@@ -519,29 +519,18 @@ h3 {
   border: 1px solid var(--panel-line);
   border-radius: 30px;
   box-shadow: var(--panel-shadow);
-  backdrop-filter: blur(32px) saturate(180%);
-  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
   isolation: isolate;
+  contain: paint;
+}
+
+.feature-card.glass-panel,
+.insight-card.glass-panel {
   transition:
     transform 0.5s var(--ease-luxe),
     box-shadow 0.5s var(--ease-luxe),
     border-color 0.5s var(--ease-luxe);
-}
-
-.glass-panel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(140deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.02) 35%, rgba(255, 255, 255, 0.04) 65%, rgba(255, 255, 255, 0.22));
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  pointer-events: none;
-  z-index: -1;
 }
 
 .glass-group {
@@ -1093,9 +1082,9 @@ h3 {
   background:
     radial-gradient(circle at 50% 22%, rgba(255, 255, 255, 0.16), transparent 32%),
     radial-gradient(circle at 80% 90%, rgba(176, 110, 220, 0.18), transparent 38%),
-    rgba(10, 6, 24, 0.58);
-  backdrop-filter: blur(24px) saturate(150%);
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
+    rgba(10, 6, 24, 0.62);
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
 }
 
 .modal-panel {
@@ -1115,8 +1104,8 @@ h3 {
     0 12px 32px rgba(7, 4, 22, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.32),
     inset 0 -1px 0 rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(36px) saturate(180%);
-  -webkit-backdrop-filter: blur(36px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
   color: var(--white);
   transform: translateY(24px) scale(0.96);
   opacity: 0;
