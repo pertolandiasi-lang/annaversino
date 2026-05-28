@@ -430,8 +430,8 @@ h3 {
   box-shadow:
     0 10px 28px rgba(7, 4, 22, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .button-ghost:hover,
@@ -542,15 +542,17 @@ h3 {
   -webkit-backdrop-filter: none;
 }
 
-/* Header keeps backdrop-filter — small area, big visual gain.
-   Higher alpha keeps the tint stable while scrolling so the bar
-   doesn't visibly shift color as different sections pass behind. */
+/* Near-solid header so it renders identically on every browser.
+   Backdrop-filter is intentionally OFF — its re-compute on every
+   scroll frame was the source of the "color switch" flicker
+   (especially on Chrome). The gradient + shadow give the depth. */
 .site-header-bar.glass-panel {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.02)),
-    rgba(20, 14, 48, 0.78);
-  backdrop-filter: blur(18px) saturate(150%);
-  -webkit-backdrop-filter: blur(18px) saturate(150%);
+    rgba(20, 14, 48, 0.94);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transform: translateZ(0);
 }
 
 .glass-group {
@@ -1241,12 +1243,12 @@ h3 {
     border-radius: 34px;
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.02)),
-      rgba(20, 14, 48, 0.78);
+      rgba(20, 14, 48, 0.94);
     box-shadow:
-      0 28px 54px rgba(6, 3, 20, 0.14),
+      0 28px 54px rgba(6, 3, 20, 0.18),
       inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(18px) saturate(150%);
-    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     pointer-events: none;
     z-index: 0;
     transition:
@@ -1258,15 +1260,15 @@ h3 {
       box-shadow 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  /* When the menu is open the bar+menu shell becomes a proper
-     frosted-glass overlay so page content is no longer legible
-     behind the nav links. */
+  /* When the menu is open the bar+menu shell becomes a near-solid
+     overlay so page content is no longer legible behind the nav
+     links (no backdrop-filter — same look on every browser). */
   .site-header.mobile-menu-open .site-header-bar::before {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
-      rgba(18, 12, 44, 0.96);
-    backdrop-filter: blur(32px) saturate(180%);
-    -webkit-backdrop-filter: blur(32px) saturate(180%);
+      rgba(18, 12, 44, 0.98);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     box-shadow:
       0 36px 70px rgba(6, 3, 20, 0.38),
       inset 0 1px 0 rgba(255, 255, 255, 0.10);
