@@ -104,7 +104,11 @@ function setPageScrollLock(shouldLock) {
 
 function updateBodyScrollLock() {
   const modalOpen = !!modal && !modal.classList.contains("hidden");
-  setPageScrollLock(modalOpen);
+  // For PDF/pages modals we deliberately leave body scroll UNLOCKED
+  // so iOS Safari can collapse the URL bar as the user scrolls.
+  // We sync modal scroll back to the window separately.
+  const pagesMode = modalOpen && !!modal.querySelector("#modal-body.modal-body-pages");
+  setPageScrollLock(modalOpen && !pagesMode);
 }
 
 function syncCollapsedHeaderOffset() {
@@ -345,12 +349,12 @@ const modalContent = {
     kicker: "Blog",
     title: "Becoming Vulvaverse",
     pages: [
-      "assets/vulvaverse/story-becoming/page-1.jpg?v=12",
-      "assets/vulvaverse/story-becoming/page-2.jpg?v=12",
-      "assets/vulvaverse/story-becoming/page-3.jpg?v=12",
-      "assets/vulvaverse/story-becoming/page-4.jpg?v=12",
-      "assets/vulvaverse/story-becoming/page-5.jpg?v=12",
-      "assets/vulvaverse/story-becoming/page-6.jpg?v=12"
+      "assets/vulvaverse/story-becoming/page-1.jpg?v=13",
+      "assets/vulvaverse/story-becoming/page-2.jpg?v=13",
+      "assets/vulvaverse/story-becoming/page-3.jpg?v=13",
+      "assets/vulvaverse/story-becoming/page-4.jpg?v=13",
+      "assets/vulvaverse/story-becoming/page-5.jpg?v=13",
+      "assets/vulvaverse/story-becoming/page-6.jpg?v=13"
     ],
     body: [
       "Did this make you a little bit curious — or cringe? Then I highly recommend to continue reading. Maybe you will cringe even more, maybe you will start to wonder what your vulva looks, feels, smells and tastes like. Maybe both. In any case: welcome to the Vulvaverse.",
@@ -424,6 +428,7 @@ function setModalContent(key) {
 }
 
 let modalCloseTimer = null;
+let savedBodyScrollY = 0;
 
 function openModal(key) {
   if (!modal) {
@@ -435,9 +440,32 @@ function openModal(key) {
     modalCloseTimer = null;
   }
 
+  // Remember where the page was so we can restore it on close.
+  // We do NOT hard-lock body scroll for the story modal — that
+  // would prevent iOS Safari's URL bar from auto-collapsing while
+  // the user reads through the PDF pages.
+  savedBodyScrollY = window.scrollY;
+
   setModalContent(key);
   modal.classList.remove("hidden", "is-closing");
   updateBodyScrollLock();
+
+  // Sync modal scroll → body scroll so iOS shrinks the URL bar
+  // when the user scrolls through long modal content (like the
+  // 'Becoming Vulvaverse' PDF pages).
+  const body = modal.querySelector("#modal-body.modal-body-pages");
+  if (body) {
+    body.addEventListener("scroll", forwardModalScrollToWindow, { passive: true });
+  }
+}
+
+function forwardModalScrollToWindow(event) {
+  const t = event.currentTarget;
+  if (!t) return;
+  const maxBody = Math.max(t.scrollHeight - t.clientHeight, 1);
+  const maxWin = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+  const ratio = t.scrollTop / maxBody;
+  window.scrollTo({ top: Math.round(ratio * maxWin), behavior: "auto" });
 }
 
 function closeModal() {
@@ -455,7 +483,13 @@ function closeModal() {
     modal.classList.add("hidden");
     modal.classList.remove("is-closing");
     modalCloseTimer = null;
+    const body = modal.querySelector("#modal-body.modal-body-pages");
+    if (body) {
+      body.removeEventListener("scroll", forwardModalScrollToWindow);
+    }
     updateBodyScrollLock();
+    // Put the page back where the user was before opening the modal
+    window.scrollTo({ top: savedBodyScrollY, behavior: "auto" });
   }, 300);
 }
 
