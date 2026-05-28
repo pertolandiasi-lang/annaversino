@@ -716,6 +716,46 @@ navLinks.forEach((link) => {
   });
 });
 
+function populateNextEventTicker() {
+  const ticker = document.getElementById("next-event-ticker");
+  if (!ticker) return;
+
+  const items = Array.from(document.querySelectorAll(".market-list-item"));
+  if (items.length === 0) return;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let next = null;
+  let nextDate = null;
+
+  for (const item of items) {
+    const dateText = item.querySelector(".market-date")?.textContent?.trim();
+    if (!dateText) continue;
+    const parsed = new Date(dateText);
+    if (isNaN(parsed.getTime())) continue;
+    if (parsed < today) continue;
+    if (!nextDate || parsed < nextDate) {
+      next = item;
+      nextDate = parsed;
+    }
+  }
+
+  if (!next) return;
+
+  const name = next.querySelector(".market-name")?.textContent?.trim() || "";
+  const place = next.querySelector(".market-place")?.textContent?.trim() || "";
+  const dateText = next.querySelector(".market-date")?.textContent?.trim() || "";
+  const shortDate = dateText.replace(/,\s*\d{4}$/, "");
+
+  ticker.textContent = `Next · ${name} · ${shortDate}`;
+  if (place) {
+    ticker.setAttribute("title", `${name} — ${place}, ${dateText}`);
+  }
+  ticker.classList.add("is-ready");
+}
+
+populateNextEventTicker();
 updateUniverseBackground();
 syncCollapsedHeaderOffset();
 updateMobileHeaderState();

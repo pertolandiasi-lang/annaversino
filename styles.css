@@ -702,6 +702,136 @@ h3 {
   font-style: italic;
 }
 
+.market-list {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.market-list-item {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  grid-template-areas:
+    "date name"
+    "date place";
+  gap: 2px 18px;
+  align-items: baseline;
+  padding: 14px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.market-list-item:first-child {
+  border-top: 0;
+  padding-top: 4px;
+}
+
+.market-date {
+  grid-area: date;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--pink);
+  letter-spacing: 0.01em;
+  line-height: 1;
+  padding-top: 4px;
+}
+
+.market-name {
+  grid-area: name;
+  color: var(--white);
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.market-place {
+  grid-area: place;
+  color: var(--white-soft);
+  font-size: 0.92rem;
+}
+
+/* Next-event ticker — slim luxe pill that pulses gently and links
+   to the Markets section. JS fills the content from the upcoming
+   markets list so it always shows the next future date. */
+.next-event-ticker {
+  display: none;
+  position: relative;
+  z-index: 30;
+  margin: 12px auto 0;
+  padding: 9px 22px;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.02)),
+    rgba(22, 16, 54, 0.7);
+  box-shadow:
+    0 12px 30px rgba(7, 4, 22, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  color: var(--white);
+  font-size: 0.86rem;
+  letter-spacing: 0.02em;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    transform 0.32s var(--ease-spring),
+    box-shadow 0.4s var(--ease-luxe),
+    border-color 0.4s var(--ease-luxe),
+    background 0.4s var(--ease-luxe);
+}
+
+.next-event-ticker.is-ready {
+  display: inline-block;
+  animation: ticker-fade-in 0.7s var(--ease-luxe) both;
+}
+
+.next-event-ticker::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 10px;
+  vertical-align: middle;
+  border-radius: 999px;
+  background: var(--pink);
+  box-shadow: 0 0 0 0 var(--glow);
+  animation: ticker-pulse 2.4s ease-in-out infinite;
+}
+
+.next-event-ticker:hover,
+.next-event-ticker:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.42);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04)),
+    rgba(22, 16, 54, 0.82);
+  box-shadow:
+    0 18px 40px rgba(7, 4, 22, 0.40),
+    0 0 0 1px var(--glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+@keyframes ticker-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--glow);
+  }
+  50% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
+
+@keyframes ticker-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .product-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
