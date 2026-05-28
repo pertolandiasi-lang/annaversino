@@ -655,11 +655,6 @@ function runMobileHeaderStateUpdate() {
     return;
   }
 
-  const isMobile = window.innerWidth <= 760;
-  const isScrolled = window.scrollY > 120;
-
-  siteHeader.classList.toggle("mobile-scrolled", isMobile && isScrolled);
-
   if (!isCollapsedNav()) {
     closeMobileMenu({ immediate: true });
     syncCollapsedHeaderOffset();
