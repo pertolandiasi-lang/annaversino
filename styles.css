@@ -1422,10 +1422,12 @@ h3 {
   }
 
   .hero {
-    /* Use dvh so the hero fills the actual visible viewport on
-       both Safari and Chrome mobile (accounts for the URL bar). */
-    min-height: 100dvh;
-    padding-top: calc(var(--header-offset, 130px) + 20px);
+    /* Hero takes exactly the area below the floating header.
+       page-shell already adds padding-top: var(--header-offset),
+       so the hero itself just needs to be (100dvh - header-offset)
+       tall and content centers within it via place-items: center. */
+    min-height: calc(100dvh - var(--header-offset, 130px));
+    padding-top: 24px;
     padding-bottom: 32px;
   }
 
