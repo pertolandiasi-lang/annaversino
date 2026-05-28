@@ -657,7 +657,6 @@ function runMobileHeaderStateUpdate() {
 
   if (!isCollapsedNav()) {
     closeMobileMenu({ immediate: true });
-    syncCollapsedHeaderOffset();
     return;
   }
 
@@ -666,7 +665,6 @@ function runMobileHeaderStateUpdate() {
   if (isMobileMenuOpen()) {
     syncMobileMenuMetrics();
   }
-  syncCollapsedHeaderOffset();
   updateBodyScrollLock();
 }
 
@@ -720,88 +718,16 @@ navLinks.forEach((link) => {
 });
 
 updateUniverseBackground();
+syncCollapsedHeaderOffset();
 updateMobileHeaderState();
+// Header offset only depends on viewport, not scroll — compute on resize only.
 window.addEventListener("scroll", updateUniverseBackground, { passive: true });
 window.addEventListener("scroll", updateMobileHeaderState, { passive: true });
-document.addEventListener(
-  "wheel",
-  (event) => {
-    if (!isMobileMenuOpen()) {
-      return;
-    }
-
-    const deltaY = normalizeWheelDelta(event);
-
-    if (Math.abs(deltaY) < 0.5) {
-      return;
-    }
-
-    event.preventDefault();
-    applyMenuGestureDelta(deltaY);
-  },
-  { passive: false, capture: true }
-);
-document.addEventListener(
-  "touchstart",
-  (event) => {
-    if (!isMobileMenuOpen()) {
-      menuTouchY = null;
-      return;
-    }
-
-    menuTouchY = event.touches[0]?.clientY ?? null;
-  },
-  { passive: true, capture: true }
-);
-document.addEventListener(
-  "touchmove",
-  (event) => {
-    if (!isMobileMenuOpen()) {
-      menuTouchY = null;
-      return;
-    }
-
-    const currentTouchY = event.touches[0]?.clientY;
-
-    if (typeof currentTouchY !== "number") {
-      return;
-    }
-
-    if (menuTouchY === null) {
-      menuTouchY = currentTouchY;
-      return;
-    }
-
-    const deltaY = menuTouchY - currentTouchY;
-
-    if (Math.abs(deltaY) < 0.5) {
-      return;
-    }
-
-    event.preventDefault();
-    applyMenuGestureDelta(deltaY);
-    menuTouchY = currentTouchY;
-  },
-  { passive: false, capture: true }
-);
-document.addEventListener(
-  "touchend",
-  () => {
-    menuTouchY = null;
-  },
-  { capture: true }
-);
-document.addEventListener(
-  "touchcancel",
-  () => {
-    menuTouchY = null;
-  },
-  { capture: true }
-);
-window.addEventListener("blur", () => {
-  menuTouchY = null;
-});
+// Scroll/touch gestures used to auto-close the menu progressively,
+// which felt jittery. Menu now closes only via explicit action
+// (tap a link, tap Menu again, tap outside, or press Escape).
 window.addEventListener("resize", () => {
   updateUniverseBackground();
+  syncCollapsedHeaderOffset();
   updateMobileHeaderState();
 });

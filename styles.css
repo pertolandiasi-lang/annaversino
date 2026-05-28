@@ -1306,10 +1306,10 @@ h3 {
     scrollbar-width: none;
     touch-action: pan-y;
     transition:
-      max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.32s ease,
-      transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-      padding 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+      max-height 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.55s ease,
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      padding 0.7s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .site-nav::-webkit-scrollbar {
@@ -1364,12 +1364,23 @@ h3 {
   .site-nav.open a {
     opacity: calc(0.22 + (0.74 * var(--menu-progress, 0)));
     transform:
-      translateY(calc((1 - var(--menu-progress, 0)) * -12px))
+      translateY(calc((1 - var(--menu-progress, 0)) * -16px))
       scale(calc(0.985 + (0.015 * var(--menu-progress, 0))));
     transition:
-      opacity 0.28s ease,
-      transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      opacity 0.5s ease,
+      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
+
+  /* Stagger link entrance for an elegant cascade */
+  .site-nav.open a:nth-child(1)  { transition-delay: 0.06s; }
+  .site-nav.open a:nth-child(2)  { transition-delay: 0.10s; }
+  .site-nav.open a:nth-child(3)  { transition-delay: 0.14s; }
+  .site-nav.open a:nth-child(4)  { transition-delay: 0.18s; }
+  .site-nav.open a:nth-child(5)  { transition-delay: 0.22s; }
+  .site-nav.open a:nth-child(6)  { transition-delay: 0.26s; }
+  .site-nav.open a:nth-child(7)  { transition-delay: 0.30s; }
+  .site-nav.open a:nth-child(8)  { transition-delay: 0.34s; }
+  .site-nav.open a:nth-child(9)  { transition-delay: 0.38s; }
 
   .site-nav.open a + a {
     border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -1565,11 +1576,11 @@ h3 {
   .site-nav.open a {
     opacity: calc(0.22 + (0.74 * var(--menu-progress, 0)));
     transform:
-      translateY(calc((1 - var(--menu-progress, 0)) * -12px))
+      translateY(calc((1 - var(--menu-progress, 0)) * -16px))
       scale(calc(0.985 + (0.015 * var(--menu-progress, 0))));
     transition:
-      opacity 0.28s ease,
-      transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      opacity 0.5s ease,
+      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .site-nav.open a + a {
