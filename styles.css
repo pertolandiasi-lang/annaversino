@@ -525,13 +525,22 @@ h3 {
 .insight-card.glass-panel,
 .product-tile.glass-panel,
 .blog-item.glass-panel,
-.hero-mission.glass-panel,
-.site-header-bar.glass-panel {
+.hero-mission.glass-panel {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04)),
     rgba(22, 16, 54, 0.55);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+}
+
+/* Header keeps backdrop-filter — small area, big visual gain.
+   Without it, page content scrolls visibly through the bar. */
+.site-header-bar.glass-panel {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03)),
+    rgba(22, 16, 54, 0.45);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
 }
 
 .glass-group {
@@ -1221,13 +1230,13 @@ h3 {
     border: 1px solid var(--panel-line);
     border-radius: 34px;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04)),
-      rgba(22, 16, 54, 0.55);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03)),
+      rgba(22, 16, 54, 0.45);
     box-shadow:
       0 28px 54px rgba(6, 3, 20, 0.14),
       inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
     pointer-events: none;
     z-index: 0;
     transition:
