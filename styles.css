@@ -1684,13 +1684,14 @@ h3 {
 
   .site-header-bar {
     width: calc(100% - 0.5rem);
-    gap: 14px;
-    padding: 14px 16px;
+    gap: 12px;
+    padding: 10px 14px;
     border-radius: 28px;
-    display: grid;
-    grid-template-columns: 1fr;
+    /* Brand on the left, hamburger on the right — single thin row */
+    display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-items: center;
+    justify-content: space-between;
     transition:
       padding 0.42s cubic-bezier(0.22, 1, 0.36, 1),
       gap 0.42s cubic-bezier(0.22, 1, 0.36, 1),
@@ -1709,7 +1710,7 @@ h3 {
   }
 
   .brand img {
-    width: min(160px, 44vw);
+    width: min(150px, 40vw);
     transition: width 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
@@ -1721,8 +1722,8 @@ h3 {
   }
 
   .brand {
-    grid-column: 1 / -1;
-    justify-self: center;
+    /* Brand sits naturally on the left of the flex row */
+    flex: 0 1 auto;
   }
 
   .mobile-nav-preview {
@@ -1757,9 +1758,10 @@ h3 {
 
   .header-actions {
     display: flex;
-    width: 100%;
-    justify-content: center;
+    width: auto;
+    justify-content: flex-end;
     gap: 14px;
+    flex: 0 0 auto;
     transition: gap 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
