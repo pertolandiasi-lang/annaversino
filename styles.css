@@ -129,25 +129,8 @@ a {
   border-radius: 34px;
 }
 
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-}
-
-.brand-star {
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-}
-
-.brand-name {
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--white);
+.brand img {
+  width: min(180px, 34vw);
 }
 
 .menu-toggle {
@@ -1795,13 +1778,9 @@ h3 {
     border-bottom-right-radius: 16px;
   }
 
-  .brand-star {
-    width: 28px;
-    height: 28px;
-  }
-
-  .brand-name {
-    font-size: 1.25rem;
+  .brand img {
+    width: min(150px, 40vw);
+    transition: width 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .menu-toggle {
@@ -1932,8 +1911,9 @@ h3 {
     padding-bottom: 12px;
   }
 
-  /* mobile-scrolled state no longer changes brand size — brand uses
-     dedicated .brand-star and .brand-name now, not the legacy img */
+  .site-header.mobile-scrolled .brand img {
+    width: min(146px, 42vw);
+  }
 
   .site-header.mobile-scrolled .mobile-nav-preview {
     max-height: 0;
@@ -2111,13 +2091,8 @@ h3 {
     border-radius: 24px;
   }
 
-  .brand-star {
-    width: 26px;
-    height: 26px;
-  }
-
-  .brand-name {
-    font-size: 1.15rem;
+  .brand img {
+    width: min(144px, 46vw);
   }
 
   .mobile-nav-preview {
