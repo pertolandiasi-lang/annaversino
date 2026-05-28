@@ -1462,12 +1462,6 @@ h3 {
   background: transparent;
 }
 
-/* Pull each subsequent page up slightly so the bottom of one and the
-   top of the next overlap by a few pixels. This visually erases the
-   join line that was showing between the differing star fields. */
-#modal-body .modal-page + .modal-page {
-  margin-top: -10px;
-}
 
 /* Round only the very first and last edges so the document looks
    like one elegant capsule rather than disconnected rectangles. */
