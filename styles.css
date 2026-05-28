@@ -1385,19 +1385,17 @@ h3 {
 }
 
 .modal-close {
-  position: sticky;
-  top: 18px;
-  margin-left: auto;
-  margin-right: 18px;
-  margin-bottom: -42px;
-  z-index: 5;
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 60;
   width: 42px;
   height: 42px;
-  border: 1px solid rgba(255, 255, 255, 0.26);
+  border: 1px solid rgba(255, 255, 255, 0.32);
   border-radius: 999px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04)),
-    rgba(20, 15, 49, 0.65);
+    rgba(20, 15, 49, 0.78);
   color: var(--white);
   backdrop-filter: blur(16px) saturate(140%);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
@@ -1491,9 +1489,8 @@ h3 {
   }
 
   .modal-close {
-    top: 12px;
-    margin-right: 12px;
-    margin-bottom: -42px;
+    top: 16px;
+    right: 16px;
   }
 }
 
