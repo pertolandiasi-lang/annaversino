@@ -632,27 +632,9 @@ contactForm?.addEventListener("submit", async (event) => {
   }
 });
 
-let backgroundFrameId = null;
-
 function updateUniverseBackground() {
-  if (!siteBackground || backgroundFrameId !== null) {
-    return;
-  }
-
-  backgroundFrameId = window.requestAnimationFrame(() => {
-    backgroundFrameId = null;
-
-    const maxScroll = Math.max(
-      document.documentElement.scrollHeight - window.innerHeight,
-      1
-    );
-    const progress = Math.min(window.scrollY / maxScroll, 1);
-    const startOffset = 48;
-    const endOffset = -48;
-    const offset = startOffset + (endOffset - startOffset) * progress;
-
-    siteBackground.style.setProperty("--bg-shift", `${offset}px`);
-  });
+  // Parallax disabled for perf — background is now fixed.
+  // Kept as no-op so existing scroll/resize listeners stay valid.
 }
 
 function updateMobileHeaderState() {

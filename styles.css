@@ -63,17 +63,11 @@ body {
 
 .site-background {
   position: fixed;
-  top: -14vh;
-  right: 0;
-  bottom: -14vh;
-  left: 0;
+  inset: 0;
   z-index: -2;
   background:
     linear-gradient(rgba(10, 6, 28, 0.44), rgba(10, 6, 28, 0.44)),
     url("assets/vulvaverse/universe-background.jpg") center center / cover no-repeat;
-  transform: translate3d(0, var(--bg-shift, 48px), 0) scale(1.08);
-  transform-origin: center center;
-  will-change: transform;
 }
 
 .site-background::after {
@@ -436,8 +430,8 @@ h3 {
   box-shadow:
     0 10px 28px rgba(7, 4, 22, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
 }
 
 .button-ghost:hover,
@@ -464,8 +458,8 @@ h3 {
   box-shadow:
     0 20px 50px rgba(7, 4, 22, 0.28),
     inset 0 1px 0 rgba(255, 255, 255, 0.32);
-  backdrop-filter: blur(24px) saturate(170%);
-  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
 }
 
 .hero-discover .button:hover,
@@ -514,15 +508,37 @@ h3 {
 .glass-panel {
   position: relative;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04)),
-    var(--panel);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.05)),
+    rgba(20, 15, 49, 0.34);
   border: 1px solid var(--panel-line);
   border-radius: 30px;
   box-shadow: var(--panel-shadow);
-  backdrop-filter: blur(20px) saturate(150%);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
   isolation: isolate;
   contain: paint;
+}
+
+/* Heavy backdrop-filter is expensive on Chrome — only keep it
+   on hero/header/modal where it really matters. Other panels
+   fall back to a richer solid-ish background. */
+.feature-card.glass-panel,
+.insight-card.glass-panel,
+.product-tile.glass-panel,
+.blog-item.glass-panel {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04)),
+    rgba(22, 16, 54, 0.55);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.glass-group {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03)),
+    rgba(20, 15, 49, 0.52);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .feature-card.glass-panel,
