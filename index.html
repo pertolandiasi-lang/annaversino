@@ -19,7 +19,7 @@
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260528-luxe20" />
+    <link rel="stylesheet" href="styles.css?v=20260528-luxe21" />
   </head>
   <body>
     <div class="site-background" aria-hidden="true"></div>
@@ -50,11 +50,12 @@
               type="button"
               aria-expanded="false"
               aria-controls="site-nav"
+              aria-label="Open menu"
             >
-              Menu
+              <span class="menu-toggle-bar"></span>
+              <span class="menu-toggle-bar"></span>
+              <span class="menu-toggle-bar"></span>
             </button>
-
-            <a class="button" href="#workshops">Support</a>
           </div>
         </div>
       </header>
@@ -234,19 +235,28 @@
                 <p>Find me and my Jewelry, Postcards and decor items at these upcoming markets:</p>
                 <ul class="market-list">
                   <li class="market-list-item">
-                    <span class="market-date">Jun 5, 2026</span>
-                    <span class="market-name">Mercato @ Lullaby Beach</span>
-                    <span class="market-place">Polignano a Mare, IT</span>
+                    <a class="market-row" href="https://instagram.com/vul_vaverse" target="_blank" rel="noopener">
+                      <span class="market-date">Jun 5, 2026</span>
+                      <span class="market-name">Mercato @ Lullaby Beach</span>
+                      <span class="market-place">Polignano a Mare, IT</span>
+                      <span class="market-arrow" aria-hidden="true">↗</span>
+                    </a>
                   </li>
                   <li class="market-list-item">
-                    <span class="market-date">Jul 12, 2026</span>
-                    <span class="market-name">Pride Market</span>
-                    <span class="market-place">Bari, IT</span>
+                    <a class="market-row" href="https://instagram.com/vul_vaverse" target="_blank" rel="noopener">
+                      <span class="market-date">Jul 12, 2026</span>
+                      <span class="market-name">Pride Market</span>
+                      <span class="market-place">Bari, IT</span>
+                      <span class="market-arrow" aria-hidden="true">↗</span>
+                    </a>
                   </li>
                   <li class="market-list-item">
-                    <span class="market-date">Aug 20, 2026</span>
-                    <span class="market-name">Vulvastic Summer Fair</span>
-                    <span class="market-place">Ostuni, IT</span>
+                    <a class="market-row" href="https://instagram.com/vul_vaverse" target="_blank" rel="noopener">
+                      <span class="market-date">Aug 20, 2026</span>
+                      <span class="market-name">Vulvastic Summer Fair</span>
+                      <span class="market-place">Ostuni, IT</span>
+                      <span class="market-arrow" aria-hidden="true">↗</span>
+                    </a>
                   </li>
                 </ul>
               </div>
@@ -593,6 +603,6 @@
       </div>
     </div>
 
-    <script src="script.js?v=20260528-luxe20"></script>
+    <script src="script.js?v=20260528-luxe21"></script>
   </body>
 </html>
