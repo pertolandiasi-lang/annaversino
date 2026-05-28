@@ -387,23 +387,40 @@ function setModalContent(key) {
   modalBody.innerHTML = content.body.map((paragraph) => `<p>${paragraph}</p>`).join("");
 }
 
+let modalCloseTimer = null;
+
 function openModal(key) {
   if (!modal) {
     return;
   }
 
+  if (modalCloseTimer !== null) {
+    window.clearTimeout(modalCloseTimer);
+    modalCloseTimer = null;
+  }
+
   setModalContent(key);
-  modal.classList.remove("hidden");
+  modal.classList.remove("hidden", "is-closing");
   updateBodyScrollLock();
 }
 
 function closeModal() {
-  if (!modal) {
+  if (!modal || modal.classList.contains("hidden")) {
     return;
   }
 
-  modal.classList.add("hidden");
-  updateBodyScrollLock();
+  modal.classList.add("is-closing");
+
+  if (modalCloseTimer !== null) {
+    window.clearTimeout(modalCloseTimer);
+  }
+
+  modalCloseTimer = window.setTimeout(() => {
+    modal.classList.add("hidden");
+    modal.classList.remove("is-closing");
+    modalCloseTimer = null;
+    updateBodyScrollLock();
+  }, 300);
 }
 
 menuToggle?.addEventListener("click", () => {
