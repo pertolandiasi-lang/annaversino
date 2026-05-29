@@ -13,6 +13,7 @@ For deep context (palette, integrations, gotchas, what not to do), use the `vulv
 ## Critical reminders
 
 - **iOS Safari URL bar cannot be programmatically collapsed.** No JS scroll trick works. If it looks bad, the fix is visual (theme-color + viewport-fit=cover, already applied).
+- **Never put a `background` on the `html` element.** Safari paints it over the fixed negative-z-index `.site-background`, hiding the galaxy (Chromium won't show the bug). Color `body` instead.
 - **Anna reviews on iPhone 15 Pro.** After meta-tag changes she must **close and reopen** the Safari tab, not just refresh. Say so explicitly. Desktop preview can't verify iOS-Safari-specific behavior.
 - **Brand spelling:** "Vulvaverse" (not "Vulvaiverse"). "Vulvastic" is canonical, not a typo. Don't fix Anna's copy unless asked.
 

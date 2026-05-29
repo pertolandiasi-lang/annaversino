@@ -121,7 +121,7 @@ Don't wait to be asked. If a change is risky, ask first — otherwise ship.
 
 - **iOS Safari URL bar cannot be programmatically collapsed.** No JS scroll method triggers it. Apple only collapses on real touch-scroll. The fix is visual: `theme-color` + `viewport-fit=cover` + matching `html` background so the bar blends with the page. **Do not promise to shrink it.**
 - **Modal scroll lock:** when a modal is open, scrolling inside it can leak to the body. Body scroll must be locked while a modal is open.
-- **Top/bottom black bands on Safari** = `html` background doesn't match `body`. Both must be `#070d1f`.
+- **Never set a `background` on the `html` element.** In Safari/WebKit, a background on `<html>` paints OVER any `position: fixed` element with a negative `z-index` — which hides the `.site-background` galaxy entirely (Chromium doesn't have this bug, so desktop preview won't catch it). The galaxy is fixed + `inset: 0` + `viewport-fit=cover`, so it already covers the safe areas; `body { background: #070d1f }` is the fallback and `theme-color` tints Safari's chrome. If you see black bands at top/bottom on Safari, the fix is NOT an html background — extend the galaxy/body, not html.
 - **Image cache busters:** Chrome & Safari aggressively cache images. When you swap an image at the same path, append `?v=N` (bump on each replace) to force a refetch.
 - **Hero uses `svh`, not `dvh`,** to avoid resizing during URL-bar transitions on Safari.
 - **`.page-shell` already adds `--header-offset` padding** — don't double-apply on the hero or buttons get pushed off-screen on mobile.
