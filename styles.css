@@ -1723,16 +1723,19 @@ h3 {
   }
 
   .site-background {
-    /* iOS Safari: anchor to the top and size with lvh (the tallest,
-       URL-bar-hidden viewport) so the fixed galaxy always reaches the
-       physical bottom of the screen, even while the bottom URL bar is
-       shown. The old top/bottom:-10vh left an uncovered dark strip at
-       the bottom on mobile because vh + the bottom anchor shift with
-       the dynamic URL bar. */
-    top: 0;
-    bottom: auto;
-    height: 100vh;
-    height: 100lvh;
+    /* iOS Safari leaves dark strips with viewport-height units: `top: 0`
+       lands below the status bar, and any vh/bottom anchor is measured
+       against a viewport that SHRINKS when the bottom URL bar expands,
+       so the galaxy falls short (more when the bar is open). Anchoring
+       with generous fixed negative offsets instead makes the galaxy
+       overshoot the status-bar strip at the top and stay behind the URL
+       bar / home indicator at the bottom in every scroll state. The
+       overshoot is simply clipped off-screen. */
+    top: -100px;
+    bottom: -260px;
+    left: 0;
+    right: 0;
+    height: auto;
   }
 }
 
