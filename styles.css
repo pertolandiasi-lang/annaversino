@@ -47,7 +47,12 @@ html {
   scroll-behavior: smooth;
   scrollbar-gutter: stable both-edges;
   --header-offset: 0px;
-  background: #070d1f;
+  /* No background here on purpose: in Safari/WebKit, a background on
+     <html> paints over a position:fixed element that has a negative
+     z-index, which would hide the .site-background galaxy. The body
+     background below is the fallback color; the galaxy (fixed, inset:0,
+     viewport-fit=cover) covers the safe areas, and the theme-color meta
+     tints Safari's chrome. */
 }
 
 html.page-scroll-locked,
