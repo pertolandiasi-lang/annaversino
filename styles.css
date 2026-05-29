@@ -80,10 +80,13 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  /* Simple uniform vignette only. Removed the radial gradient
-     overlays that were creating visible soft edges at the bottom
-     of the viewport (looked like a horizontal "line"). */
-  background: linear-gradient(180deg, rgba(6, 4, 18, 0.10), rgba(6, 4, 18, 0.18));
+  background:
+    linear-gradient(180deg,
+      rgba(7, 4, 22, 1) 0%,
+      rgba(7, 4, 22, 0) 12%,
+      rgba(7, 4, 22, 0) 88%,
+      rgba(7, 4, 22, 1) 100%
+    );
 }
 
 img {
