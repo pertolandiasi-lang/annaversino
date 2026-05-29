@@ -76,6 +76,18 @@ body {
     url("assets/vulvaverse/universe-background.jpg") center center / cover no-repeat;
 }
 
+@media (min-width: 1100px) {
+  /* On wide desktop the image fills the full viewport width via cover,
+     exposing the dark left edge of the photo. Zoom in to 150% width so
+     the image is always wider than the container and the bright milky
+     way centre stays visible on both sides. */
+  .site-background {
+    background:
+      linear-gradient(rgba(10, 6, 28, 0.44), rgba(10, 6, 28, 0.44)),
+      url("assets/vulvaverse/universe-background.jpg") 62% center / 150% auto no-repeat;
+  }
+}
+
 .site-background::after {
   content: "";
   position: absolute;
