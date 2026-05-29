@@ -131,6 +131,9 @@ Don't wait to be asked. If a change is risky, ask first — otherwise ship.
 - **`.glass-panel` with `contain: paint`** has clipped the mobile menu before. If the dropdown becomes invisible, suspect that property.
 - **Header sticky flicker on Chrome** was caused by `backdrop-filter` on a sticky element. Current header is near-solid; don't re-add blur to the sticky header.
 - **Casing parity on form options:** "Mirror, mirror - Oh Vulvina" (lowercase second `mirror`, no `!`) MUST match `CONFIG.allowedTopics` in Code.js. Don't "fix" the casing in one place without the other.
+- **Galaxy top/bottom edge fade:** `.site-background::after` uses a `linear-gradient` that fades the top 12% and bottom 45% of the background to `rgba(7,4,22,1)`. This makes the edges blend into the dark violet instead of hard-cutting — especially important on mobile where the galaxy layer can't perfectly cover Safari's chrome. Don't remove this fade.
+- **Galaxy on wide desktop (>1100px):** at full cover, the left side of the original photo is dark empty space. The fix is `background-size: 150% auto; background-position: 62% center` inside `@media (min-width: 1100px)` — this zooms in so the bright milky way stays centered on wide screens. Mobile keeps `cover` (base rule). Don't remove the desktop override or the left edge will go dark again.
+- **CSS cache-buster must be bumped manually.** `index.html` links `styles.css?v=YYYYMMDD-tag`. It does NOT auto-change — non-private browsers will serve stale CSS until you bump it. Bump on every `styles.css` change. Private-mode browsers always fetch fresh, so use private mode to verify quickly.
 
 ---
 
