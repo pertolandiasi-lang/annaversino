@@ -1483,23 +1483,41 @@ h3 {
    Small side gutters so pages can fill width while corners stay
    rounded on both top AND bottom. */
 @media (max-width: 760px) {
+  /* The overlay fills the *visible* viewport (dvh), not the large one,
+     and is itself the scroll container. The panel centers when it's
+     shorter than the screen (margin:auto) and pins to the top — fully
+     scrollable — when it's taller. This keeps the title and close
+     button reachable instead of being clipped off the top edge.
+     Padding respects the notch / home-indicator safe areas. */
   .modal {
-    padding: 12px 8px;
+    top: 0;
+    bottom: auto;
+    height: 100dvh;
+    align-items: start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding:
+      calc(env(safe-area-inset-top, 0px) + 14px) 8px
+      calc(env(safe-area-inset-bottom, 0px) + 14px);
   }
 
-  /* Use lvh (large viewport) so the modal stretches under Safari's
-     URL-bar capsule — the bar floats over the modal instead of
-     stealing screen real estate. Bottom of the modal sits below
-     the URL bar but its rounded corners still show because the
-     panel is taller than the URL bar overlay. */
+  /* Backdrop is fixed to the full physical screen so there are no
+     undimmed dark strips above/below the modal. */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+  }
+
   .modal-panel {
     width: 100%;
-    max-height: calc(100lvh - 24px);
+    max-height: none;
+    margin: auto 0;
+    overflow: visible;
     border-radius: 24px;
   }
 
   .modal-close {
-    top: 16px;
+    top: calc(env(safe-area-inset-top, 0px) + 16px);
     right: 16px;
   }
 }

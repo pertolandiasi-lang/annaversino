@@ -83,12 +83,22 @@ function isMobileMenuOpen() {
   return isCollapsedNav() && !!siteNav?.classList.contains("open");
 }
 
+let lockedScrollY = 0;
+
 function setPageScrollLock(shouldLock) {
   if (shouldLock && !isPageScrollLocked) {
+    // iOS Safari ignores `overflow: hidden` on the body, so the page
+    // keeps scrolling behind a modal. Pinning the body with
+    // `position: fixed` at the negated scroll offset is the only
+    // reliable cross-browser lock. We restore the offset on unlock.
+    lockedScrollY = window.scrollY;
     document.documentElement.classList.add("page-scroll-locked");
     document.body.classList.add("page-scroll-locked");
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${lockedScrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
     isPageScrollLocked = true;
     return;
   }
@@ -96,8 +106,12 @@ function setPageScrollLock(shouldLock) {
   if (!shouldLock && isPageScrollLocked) {
     document.documentElement.classList.remove("page-scroll-locked");
     document.body.classList.remove("page-scroll-locked");
-    document.documentElement.style.overflow = "";
-    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.left = "";
+    document.body.style.right = "";
+    document.body.style.width = "";
+    window.scrollTo(0, lockedScrollY);
     isPageScrollLocked = false;
   }
 }
@@ -444,6 +458,15 @@ function openModal(key) {
 
   setModalContent(key);
   modal.classList.remove("hidden", "is-closing");
+
+  // Always open scrolled to the top so the title and close button are
+  // visible, regardless of where the previous modal was left.
+  modal.scrollTop = 0;
+  const panel = modal.querySelector(".modal-panel");
+  if (panel) {
+    panel.scrollTop = 0;
+  }
+
   updateBodyScrollLock();
 }
 
