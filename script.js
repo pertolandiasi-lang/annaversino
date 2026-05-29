@@ -720,8 +720,7 @@ function getHeaderOffset() {
 
 function scrollToSection(targetId) {
   // 'Home' returns to the absolute top of the page so the hero is
-  // perfectly framed (and Safari's URL bar collapse animates from
-  // its full state).
+  // perfectly framed.
   if (targetId === "home") {
     window.scrollTo({ top: 0, behavior: "smooth" });
     return;

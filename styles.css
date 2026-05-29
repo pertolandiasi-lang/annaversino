@@ -47,6 +47,7 @@ html {
   scroll-behavior: smooth;
   scrollbar-gutter: stable both-edges;
   --header-offset: 0px;
+  background: #070d1f;
 }
 
 html.page-scroll-locked,
