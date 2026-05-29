@@ -1705,8 +1705,16 @@ h3 {
   }
 
   .site-background {
-    top: -10vh;
-    bottom: -10vh;
+    /* iOS Safari: anchor to the top and size with lvh (the tallest,
+       URL-bar-hidden viewport) so the fixed galaxy always reaches the
+       physical bottom of the screen, even while the bottom URL bar is
+       shown. The old top/bottom:-10vh left an uncovered dark strip at
+       the bottom on mobile because vh + the bottom anchor shift with
+       the dynamic URL bar. */
+    top: 0;
+    bottom: auto;
+    height: 100vh;
+    height: 100lvh;
   }
 }
 
